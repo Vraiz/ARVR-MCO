@@ -22,7 +22,7 @@ public class PortalScript : MonoBehaviour
         if (!isInteracting)
         {
             rend.material = onMaterial;
-            playerText.text = "Interact with portal?";
+            playerText.text = "Press E to interact with portal?";
         }
     }
 
