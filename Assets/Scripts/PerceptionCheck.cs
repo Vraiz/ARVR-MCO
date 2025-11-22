@@ -194,13 +194,4 @@ public class PerceptionCheck : MonoBehaviour
             resultText.text = "";
         }
     }
-
-    void OnDestroy()
-{
-    // Unregister from UIManager when object is destroyed
-    if (UIManager.Instance != null)
-    {
-        UIManager.Instance.UnregisterPerceptionCheck(this);
-    }
-}
 }
