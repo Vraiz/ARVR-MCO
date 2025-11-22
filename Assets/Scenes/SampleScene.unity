@@ -797,7 +797,7 @@ MonoBehaviour:
       m_Calls: []
   m_SerializedLibrary: {fileID: 11400000, guid: a19c591f5a483fb48a29d9ad7e436f68, type: 2}
   m_MaxNumberOfMovingImages: 1
-  m_TrackedImagePrefab: {fileID: 7739616680793730550, guid: b2d58c425ee4c834eaa2197ba8527585, type: 3}
+  m_TrackedImagePrefab: {fileID: 5405319264629616352, guid: 40919373d736df1469b5f99169201ca1, type: 3}
 --- !u!114 &1096945871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1202,7 +1202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   displayText: {fileID: 1650751025322759724}
   diceSides: 20
-  perceptionCheckObjectName: FaceActive
+  perceptionCheck: {fileID: 0}
 --- !u!224 &2525690864051911655
 RectTransform:
   m_ObjectHideFlags: 0
