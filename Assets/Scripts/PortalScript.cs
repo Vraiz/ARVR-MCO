@@ -1,69 +1,64 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.XR.ARFoundation;
 
 public class PortalScript : MonoBehaviour
 {
     public TMP_Text playerText;
     public Material onMaterial;
     public Material offMaterial;
-    public GameObject interactionUI;
+    public GameObject interactionUI; // Assign your UI panel in Inspector
     private Renderer rend;
     private bool isInteracting = false;
-    private ARRaycastManager raycastManager;
-    private Camera arCamera;
 
     void Start()
     {
         rend = GetComponent<Renderer>();
-        arCamera = Camera.main;
-        raycastManager = FindFirstObjectByType<ARRaycastManager>();
-        
         if (interactionUI != null)
             interactionUI.SetActive(false);
     }
 
-    void Update()
-    {
-        // Handle touch input for AR
-        if (!isInteracting && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-        {
-            CheckForPortalTouch(Input.GetTouch(0).position);
-        }
-    }
-
-    void CheckForPortalTouch(Vector2 touchPosition)
-    {
-        // Raycast to detect if portal was touched
-        Ray ray = arCamera.ScreenPointToRay(touchPosition);
-        RaycastHit hit;
-        
-        if (Physics.Raycast(ray, out hit))
-        {
-            if (hit.collider.gameObject == this.gameObject)
-            {
-                StartInteraction();
-            }
-        }
-    }
-
-    // Visual feedback when portal is being looked at (optional for AR)
-    public void OnPortalGazed()
+    void OnMouseEnter()
     {
         if (!isInteracting)
         {
             rend.material = onMaterial;
-            playerText.text = "Tap to interact with portal";
+            playerText.text = "Press E to interact with portal?";
         }
     }
 
-    public void OnPortalUngazed()
+    void OnMouseExit()
     {
         if (!isInteracting)
         {
             rend.material = offMaterial;
             playerText.text = "";
         }
+    }
+
+    void Update()
+    {
+        // Check if mouse is over object and E is pressed
+        if (Input.GetKeyDown(KeyCode.E) && IsMouseOverObject())
+        {
+            StartInteraction();
+        }
+
+        // Optional: Add ESC key to exit interaction
+        if (isInteracting && Input.GetKeyDown(KeyCode.Escape))
+        {
+            EndInteraction();
+        }
+    }
+
+    bool IsMouseOverObject()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            return hit.collider.gameObject == this.gameObject;
+        }
+        return false;
     }
 
     void StartInteraction()
@@ -74,8 +69,13 @@ public class PortalScript : MonoBehaviour
         if (interactionUI != null)
             interactionUI.SetActive(true);
         
-        // For AR, we don't need to lock cursor
-        // Just make sure UI is touch-friendly
+        // Freeze camera movement
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        
+        // You might want to disable camera movement script here
+        // Example: if you have a MouseLook script
+        // Camera.main.GetComponent<MouseLook>().enabled = false;
     }
 
     public void EndInteraction()
@@ -85,6 +85,13 @@ public class PortalScript : MonoBehaviour
         // Hide UI
         if (interactionUI != null)
             interactionUI.SetActive(false);
+        
+        // Restore camera movement
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        
+        // Re-enable camera movement script
+        // Camera.main.GetComponent<MouseLook>().enabled = true;
         
         // Reset materials and text
         rend.material = offMaterial;
