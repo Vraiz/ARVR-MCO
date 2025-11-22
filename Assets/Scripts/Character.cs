@@ -135,7 +135,7 @@ public class Character : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
             {
-                if(crossHairText.text == "Press E to interact with portal?")
+                if(crossHairText.text == "Interact with portal?")
                 {
                     PortalEvent();
                 } else if(crossHairText.text == "Interact with trophy?")
