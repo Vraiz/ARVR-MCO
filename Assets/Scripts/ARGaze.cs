@@ -30,10 +30,10 @@ public class ARGazeDetector : MonoBehaviour
             {
                 currentPerceptionObject = perceptionObj;
                 
-                // Connect the dice roll to this perception check
-                if (diceRoll != null)
+                // Connect the dice roll to this perception check by NAME
+                if (diceRoll != null && UIManager.Instance != null)
                 {
-                    diceRoll.perceptionCheck = perceptionObj;
+                    UIManager.Instance.SetDiceRollTarget(perceptionObj.gameObject.name);
                 }
                 
                 perceptionObj.OnObjectGazed();
