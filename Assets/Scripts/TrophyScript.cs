@@ -1,7 +1,5 @@
 using UnityEngine;
 using TMPro;
-using System.Threading.Tasks;
-
 
 public class TrophyScript : MonoBehaviour
 {
@@ -14,13 +12,15 @@ public class TrophyScript : MonoBehaviour
     {
         rend = GetComponent<Renderer>();
     }
-    void OnMouseEnter()
+
+    // AR Gaze methods
+    public void OnGazeEnter()
     {
         rend.material = onMaterial;
-        playerText.text = "Interact with portal?";
+        playerText.text = "Interact with trophy?";
     }
 
-    void OnMouseExit()
+    public void OnGazeExit()
     {
         rend.material = offMaterial;
         playerText.text = "";

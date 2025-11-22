@@ -6,27 +6,54 @@ public class PortalScript : MonoBehaviour
     public TMP_Text playerText;
     public Material onMaterial;
     public Material offMaterial;
-    public GameObject interactionUI; // Assign your UI panel in Inspector
+    public GameObject interactionUI;
+    
     private Renderer rend;
     private bool isInteracting = false;
+    private Camera arCamera;
 
     void Start()
     {
         rend = GetComponent<Renderer>();
+        arCamera = Camera.main;
         if (interactionUI != null)
             interactionUI.SetActive(false);
     }
 
-    void OnMouseEnter()
+    void Update()
+    {
+        // AR Touch input
+        if (!isInteracting && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            CheckForARTouch(Input.GetTouch(0).position);
+        }
+    }
+
+    void CheckForARTouch(Vector2 touchPosition)
+    {
+        Ray ray = arCamera.ScreenPointToRay(touchPosition);
+        RaycastHit hit;
+        
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.gameObject == this.gameObject)
+            {
+                StartInteraction();
+            }
+        }
+    }
+
+    // AR Gaze methods
+    public void OnGazeEnter()
     {
         if (!isInteracting)
         {
             rend.material = onMaterial;
-            playerText.text = "Press E to interact with portal?";
+            playerText.text = "Tap to interact with portal";
         }
     }
 
-    void OnMouseExit()
+    public void OnGazeExit()
     {
         if (!isInteracting)
         {
@@ -35,65 +62,21 @@ public class PortalScript : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        // Check if mouse is over object and E is pressed
-        if (Input.GetKeyDown(KeyCode.E) && IsMouseOverObject())
-        {
-            StartInteraction();
-        }
-
-        // Optional: Add ESC key to exit interaction
-        if (isInteracting && Input.GetKeyDown(KeyCode.Escape))
-        {
-            EndInteraction();
-        }
-    }
-
-    bool IsMouseOverObject()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
-        {
-            return hit.collider.gameObject == this.gameObject;
-        }
-        return false;
-    }
-
     void StartInteraction()
     {
         isInteracting = true;
         
-        // Show UI
         if (interactionUI != null)
             interactionUI.SetActive(true);
-        
-        // Freeze camera movement
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        
-        // You might want to disable camera movement script here
-        // Example: if you have a MouseLook script
-        // Camera.main.GetComponent<MouseLook>().enabled = false;
     }
 
     public void EndInteraction()
     {
         isInteracting = false;
         
-        // Hide UI
         if (interactionUI != null)
             interactionUI.SetActive(false);
         
-        // Restore camera movement
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        
-        // Re-enable camera movement script
-        // Camera.main.GetComponent<MouseLook>().enabled = true;
-        
-        // Reset materials and text
         rend.material = offMaterial;
         playerText.text = "";
     }

@@ -6113,7 +6113,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 10.46913, y: 0.31056273, z: 12.674097}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7356490160074660825}
@@ -9404,6 +9404,7 @@ MonoBehaviour:
   - The third die you click is the red one
   - The fourth die you click is the green one
   - The last die you pick is the white one
+  useGazeDetection: 1
 --- !u!114 &9216394520330619184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9418,7 +9419,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceRoll
   displayText: {fileID: 0}
   diceSides: 20
-  perceptionCheck: {fileID: 8857569988494200062}
+  perceptionCheckObjectName: 
 --- !u!1 &8317922307317358051
 GameObject:
   m_ObjectHideFlags: 0

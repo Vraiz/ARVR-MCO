@@ -1,6 +1,5 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
 
 public class FireToggle : MonoBehaviour
 {
@@ -8,58 +7,60 @@ public class FireToggle : MonoBehaviour
     public Material onMaterial;
     public Material offMaterial;
     public Material fireMaterial;
-
     public string interactionText;
-
     public bool isLit = false;
+    
     private Renderer rend;
+    private Camera arCamera;
+    private bool isGazed = false;
 
-    void ToggleFire()
-    {
-        if (isLit == true)
-        {
-            rend.material = fireMaterial;
-        }
-        else
-        {
-            rend.material = offMaterial;
-        }
-    }
     void Start()
     {
         rend = GetComponent<Renderer>();
-    }
-    void OnMouseEnter()
-    {
-        rend.material = onMaterial;
-        playerText.text = interactionText;
-
-    }
-
-    void OnMouseExit()
-    {
-        if (isLit == true)
-        {
-            rend.material = fireMaterial;
-            playerText.text = "";
-        }
-        else
-        {
-            rend.material = offMaterial;
-            playerText.text = "";
-        }
-
+        arCamera = Camera.main;
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && playerText.text == interactionText)
+        // AR Touch input
+        if (isGazed && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
-            isLit = !isLit;
-            ToggleFire();  
+            ToggleFire();
         }
-
     }
 
+    void ToggleFire()
+    {
+        isLit = !isLit;
+        if (isLit)
+        {
+            rend.material = fireMaterial;
+        }
+        else
+        {
+            rend.material = offMaterial;
+        }
+    }
 
+    // AR Gaze methods
+    public void OnGazeEnter()
+    {
+        isGazed = true;
+        rend.material = onMaterial;
+        playerText.text = interactionText;
+    }
+
+    public void OnGazeExit()
+    {
+        isGazed = false;
+        if (isLit)
+        {
+            rend.material = fireMaterial;
+        }
+        else
+        {
+            rend.material = offMaterial;
+        }
+        playerText.text = "";
+    }
 }

@@ -2,10 +2,8 @@ using UnityEngine;
 
 public class ARGazeDetector : MonoBehaviour
 {
-    public DiceRoll diceRoll; // Assign in inspector
-    
     private Camera arCamera;
-    private PerceptionCheck currentPerceptionObject;
+    private GameObject currentGazedObject;
 
     void Start()
     {
@@ -19,33 +17,109 @@ public class ARGazeDetector : MonoBehaviour
 
     void DetectGazedObject()
     {
-        Ray ray = new Ray(arCamera.transform.position, arCamera.transform.forward);
+        // Ray from center of screen for AR gaze
+        Ray ray = arCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
         RaycastHit hit;
         
         if (Physics.Raycast(ray, out hit, 10f))
         {
-            PerceptionCheck perceptionObj = hit.collider.GetComponent<PerceptionCheck>();
-            
-            if (perceptionObj != null && perceptionObj != currentPerceptionObject)
+            if (hit.collider.gameObject != currentGazedObject)
             {
-                currentPerceptionObject = perceptionObj;
-                
-                // Connect the dice roll to this perception check by NAME
-                if (diceRoll != null)
+                // Handle previous object
+                if (currentGazedObject != null)
                 {
-                    diceRoll.SetPerceptionCheckName(perceptionObj.gameObject.name);
+                    CallGazeExit(currentGazedObject);
                 }
                 
-                perceptionObj.OnObjectGazed();
+                currentGazedObject = hit.collider.gameObject;
+                CallGazeEnter(currentGazedObject);
             }
         }
         else
         {
-            if (currentPerceptionObject != null)
+            if (currentGazedObject != null)
             {
-                currentPerceptionObject.OnObjectUngazed();
-                currentPerceptionObject = null;
+                CallGazeExit(currentGazedObject);
+                currentGazedObject = null;
             }
+        }
+    }
+
+    void CallGazeEnter(GameObject obj)
+    {
+        // Try PerceptionCheck first
+        PerceptionCheck perception = obj.GetComponent<PerceptionCheck>();
+        if (perception != null)
+        {
+            perception.OnGazeEnter();
+            return;
+        }
+        
+        // Try other interactable types...
+        PortalScript portal = obj.GetComponent<PortalScript>();
+        if (portal != null)
+        {
+            portal.OnGazeEnter();
+            return;
+        }
+        
+        TrophyScript trophy = obj.GetComponent<TrophyScript>();
+        if (trophy != null)
+        {
+            trophy.OnGazeEnter();
+            return;
+        }
+        
+        ClickDetector click = obj.GetComponent<ClickDetector>();
+        if (click != null)
+        {
+            click.OnGazeEnter();
+            return;
+        }
+        
+        FireToggle fire = obj.GetComponent<FireToggle>();
+        if (fire != null)
+        {
+            fire.OnGazeEnter();
+            return;
+        }
+    }
+
+    void CallGazeExit(GameObject obj)
+    {
+        PerceptionCheck perception = obj.GetComponent<PerceptionCheck>();
+        if (perception != null)
+        {
+            perception.OnGazeExit();
+            return;
+        }
+        
+        PortalScript portal = obj.GetComponent<PortalScript>();
+        if (portal != null)
+        {
+            portal.OnGazeExit();
+            return;
+        }
+        
+        TrophyScript trophy = obj.GetComponent<TrophyScript>();
+        if (trophy != null)
+        {
+            trophy.OnGazeExit();
+            return;
+        }
+        
+        ClickDetector click = obj.GetComponent<ClickDetector>();
+        if (click != null)
+        {
+            click.OnGazeExit();
+            return;
+        }
+        
+        FireToggle fire = obj.GetComponent<FireToggle>();
+        if (fire != null)
+        {
+            fire.OnGazeExit();
+            return;
         }
     }
 }

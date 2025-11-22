@@ -10,6 +10,8 @@ public class PerceptionCheck : MonoBehaviour
     public Material offMaterial;
     public GameObject interactionUI;
     public TMP_Text resultText;
+    public TMP_Text notification;
+    public TMP_Text diceText;
     public DiceRoll diceRoll;
     
     [Header("Perception Check Settings")]
@@ -20,6 +22,10 @@ public class PerceptionCheck : MonoBehaviour
     public string failText = "FAILURE! The portal remains mysterious, its secrets hidden from your sight.";
     public float interactionUIDisplayTime = 1f;
     public float resultDisplayTime = 3f;
+    public string[] clue = new string[5];
+    
+    [Header("AR Settings")]
+    public bool useGazeDetection = true;
     
     private Renderer rend;
     private bool isInteracting = false;
@@ -38,21 +44,19 @@ public class PerceptionCheck : MonoBehaviour
             UIManager.Instance.RegisterPerceptionCheck(this);
         }
         
-        // UI should already be disabled in inspector, but ensure it's off
-        if (interactionUI != null && interactionUI.activeInHierarchy)
-            interactionUI.SetActive(false);
+        interactionUI?.SetActive(false);
     }
 
     void Update()
     {
-        // Touch input for AR
+        // AR Touch input
         if (!isInteracting && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
-            CheckForPerceptionObjectTouch(Input.GetTouch(0).position);
+            CheckForARTouch(Input.GetTouch(0).position);
         }
     }
 
-    void CheckForPerceptionObjectTouch(Vector2 touchPosition)
+    void CheckForARTouch(Vector2 touchPosition)
     {
         Ray ray = arCamera.ScreenPointToRay(touchPosition);
         RaycastHit hit;
@@ -66,8 +70,8 @@ public class PerceptionCheck : MonoBehaviour
         }
     }
 
-    // Visual feedback when object is being looked at
-    public void OnObjectGazed()
+    // AR Gaze methods
+    public void OnGazeEnter()
     {
         if (!isInteracting && uiElementsSet)
         {
@@ -77,7 +81,7 @@ public class PerceptionCheck : MonoBehaviour
         }
     }
 
-    public void OnObjectUngazed()
+    public void OnGazeExit()
     {
         if (!isInteracting && uiElementsSet)
         {
@@ -87,7 +91,7 @@ public class PerceptionCheck : MonoBehaviour
         }
     }
 
-    // ADD THIS METHOD TO FIX THE ERROR
+    // ADD THIS METHOD TO FIX THE UIMANAGER ERROR
     public void SetUIReferences(TMP_Text newPlayerText, GameObject newInteractionUI, TMP_Text newResultText, DiceRoll newDiceRoll)
     {
         playerText = newPlayerText;
@@ -123,6 +127,10 @@ public class PerceptionCheck : MonoBehaviour
             resultText.text = "Tap the button to roll the dice!";
             resultText.color = Color.white;
         }
+        if (diceText != null)
+        {
+            diceText.text = "";
+        } 
     }
 
     public void ProcessDiceRoll()
@@ -150,26 +158,34 @@ public class PerceptionCheck : MonoBehaviour
     {
         waitingForRoll = false;
         
-        if (diceRollResult >= difficultyClass)
+        if (diceRollResult == 20)
         {
-            if (resultText != null)
-            {
-                resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText;
-                resultText.color = Color.green;
-            }
+            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText + "\n\nCritical Success!";
+            if (notification != null) notification.text = "Password is Blue -> Yellow -> Red -> Green -> White";
+            resultText.color = Color.yellow;
+        }
+        else if (diceRollResult >= difficultyClass)
+        {
+            int index = Random.Range(0, clue.Length);
+            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText;
+            if (notification != null) notification.text = clue[index];
+            resultText.color = Color.green;
+        }
+        else if(diceRollResult == 1)
+        {
+            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText + "\n\nCritical Failure!";
+            if (notification != null) notification.text = "The trophy laughs at you";
+            resultText.color = Color.red;
         }
         else
         {
-            if (resultText != null)
-            {
-                resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText;
-                resultText.color = Color.red;
-            }
+            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText;
+            if (notification != null) notification.text = "";
+            resultText.color = Color.black;
         }
         
         yield return new WaitForSeconds(interactionUIDisplayTime);
         
-        // Hide interaction UI but keep result text visible
         if (interactionUI != null)
             interactionUI.SetActive(false);
         
@@ -190,8 +206,8 @@ public class PerceptionCheck : MonoBehaviour
         if (uiElementsSet)
         {
             rend.material = offMaterial;
-            playerText.text = "";
-            resultText.text = "";
+            if (playerText != null) playerText.text = "";
+            if (resultText != null) resultText.text = "";
         }
     }
 }

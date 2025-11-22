@@ -1202,7 +1202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   displayText: {fileID: 1650751025322759724}
   diceSides: 20
-  perceptionCheck: {fileID: 0}
+  perceptionCheckObjectName: 
 --- !u!224 &2525690864051911655
 RectTransform:
   m_ObjectHideFlags: 0

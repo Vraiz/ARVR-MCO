@@ -1,27 +1,30 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
 
 public class ClickDetector : MonoBehaviour
 {
     public TMP_Text playerText;
     public Material onMaterial;
     public Material offMaterial;
-
     public string interactionText;
+    
     private Renderer rend;
+    private Camera arCamera;
 
     void Start()
     {
         rend = GetComponent<Renderer>();
+        arCamera = Camera.main;
     }
-    void OnMouseEnter()
+
+    // AR Gaze methods
+    public void OnGazeEnter()
     {
         rend.material = onMaterial;
         playerText.text = interactionText;
     }
 
-    void OnMouseExit()
+    public void OnGazeExit()
     {
         rend.material = offMaterial;
         playerText.text = "";
