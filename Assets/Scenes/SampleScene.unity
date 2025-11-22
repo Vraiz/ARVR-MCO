@@ -406,10 +406,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ec864671dc11ef4bb3830edc1378b2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ARGazeDetector
-  gazeDistance: 10
-  interactableLayer:
-    serializedVersion: 2
-    m_Bits: 1073741824
+  diceRoll: {fileID: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -537,6 +534,55 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &623419992
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 623419994}
+  - component: {fileID: 623419993}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &623419993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623419992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 345c4fab5fda3a042aef6c380e1a22d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  perceptionCheckText: {fileID: 8994332656712478059}
+  perceptionInteractionUI: {fileID: 860748939958118499}
+  perceptionResultText: {fileID: 3479313529549557532}
+  perceptionDiceRoll: {fileID: 2476635188922643084}
+  mainUI: {fileID: 0}
+--- !u!4 &623419994
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623419992}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 20.97392, y: -0.00002, z: 71.28824}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1084544054
 GameObject:
   m_ObjectHideFlags: 0
@@ -821,7 +867,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &945533239790039116
 GameObject:
   m_ObjectHideFlags: 0
@@ -1154,7 +1200,7 @@ GameObject:
   - component: {fileID: 7208743536225605923}
   - component: {fileID: 8994332656712478059}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1929,3 +1975,4 @@ SceneRoots:
   - {fileID: 1155461284}
   - {fileID: 1096945867}
   - {fileID: 1084544055}
+  - {fileID: 623419994}
