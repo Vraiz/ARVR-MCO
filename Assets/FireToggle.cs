@@ -14,7 +14,17 @@ public class FireToggle : MonoBehaviour
     public bool isLit = false;
     private Renderer rend;
 
-
+    void ToggleFire()
+    {
+        if (isLit == true)
+        {
+            rend.material = fireMaterial;
+        }
+        else
+        {
+            rend.material = offMaterial;
+        }
+    }
     void Start()
     {
         rend = GetComponent<Renderer>();
@@ -36,7 +46,6 @@ public class FireToggle : MonoBehaviour
         else
         {
             rend.material = offMaterial;
-            rend.material = offMaterial;
             playerText.text = "";
         }
 
@@ -47,15 +56,9 @@ public class FireToggle : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && playerText.text == interactionText)
         {
             isLit = !isLit;
+            ToggleFire();  
         }
-        if (isLit == true)
-        {
-            rend.material = fireMaterial;
-        }
-        else
-        {
-            rend.material = offMaterial;
-        }
+
     }
 
 

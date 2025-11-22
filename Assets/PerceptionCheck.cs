@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 
+
 public class PerceptionCheck : MonoBehaviour
 {
     public TMP_Text playerText;
@@ -9,6 +10,10 @@ public class PerceptionCheck : MonoBehaviour
     public Material offMaterial;
     public GameObject interactionUI;
     public TMP_Text resultText;
+
+    public TMP_Text notification;
+
+    public TMP_Text diceText;
     public DiceRoll diceRoll;
     
     [Header("Perception Check Settings")]
@@ -19,6 +24,8 @@ public class PerceptionCheck : MonoBehaviour
     public string failText = "FAILURE! The portal remains mysterious, its secrets hidden from your sight.";
     public float interactionUIDisplayTime = 1f; // How long the interaction UI stays after roll
     public float resultDisplayTime = 3f; // How long the result text stays after roll
+
+    public string[] clue = new string[5];
     
     private Renderer rend;
     private bool isInteracting = false;
@@ -27,8 +34,7 @@ public class PerceptionCheck : MonoBehaviour
     void Start()
     {
         rend = GetComponent<Renderer>();
-        if (interactionUI != null)
-            interactionUI.SetActive(false);
+        interactionUI?.SetActive(false);
     }
 
     void OnMouseEnter()
@@ -97,6 +103,10 @@ public class PerceptionCheck : MonoBehaviour
             resultText.text = "Click the button to roll the dice!";
             resultText.color = Color.white;
         }
+        if (diceText != null)
+        {
+            diceText.text = "";
+        } 
     }
 
     public void ProcessDiceRoll()
@@ -129,15 +139,30 @@ public class PerceptionCheck : MonoBehaviour
         waitingForRoll = false;
         
         // Determine success or failure and display appropriate text
-        if (diceRollResult >= difficultyClass)
+        if (diceRollResult == 20)
         {
+            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText + "\n\nCritical Success!";
+            notification.text = "Password is Blue -> Yellow -> Red -> Green -> White";
+            resultText.color = Color.yellow;
+        }
+        else if (diceRollResult >= difficultyClass)
+        {
+            int index = Random.Range(0, clue.Length);
             resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText;
+            notification.text = clue[index];
             resultText.color = Color.green;
+        }
+        else if(diceRollResult == 1)
+        {
+            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText + "\n\nCritical Failure!";
+            notification.text = "The trophy laughs at you";
+            resultText.color = Color.red;
         }
         else
         {
             resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText;
-            resultText.color = Color.red;
+            notification.text = "";
+            resultText.color = Color.black;
         }
         
         // Wait for interaction UI display time, then hide the interaction UI

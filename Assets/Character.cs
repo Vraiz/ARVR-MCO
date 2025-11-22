@@ -22,6 +22,12 @@ public class Character : MonoBehaviour
     public TMP_Text crossHairText;
     public TMP_Text Notification;
 
+    public TMP_Text resultText;
+
+    public TMP_Text UItext;
+
+    public GameObject interactionUI;
+
     private Vector3 moveDirection = Vector3.zero;
     private float rotationX = 0;
     private CharacterController characterController;
@@ -44,6 +50,7 @@ public class Character : MonoBehaviour
     private int currentIndex = 0;
     private CancellationTokenSource cts;
 
+    private bool isInteracting = false;
 
     public void DieClicked(int number)
     {
@@ -88,7 +95,7 @@ public class Character : MonoBehaviour
         }
         catch (TaskCanceledException)
         {
-            // Corgi
+            // Cancels exit
         }
     }
 
@@ -104,47 +111,75 @@ public class Character : MonoBehaviour
         return rand.Next(1, 21);
     }
 
-    void TrophyEvent()
+    IEnumerator WaitForUIButton()
     {
-        int result = DiceRoll();
-        if (result == 20)
+        interactionUI?.SetActive(true);
+        isInteracting = true;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        resultText.text = "";
+        
+        // Disable camera movement script
+        MonoBehaviour cameraScript = playerCamera.GetComponent<MonoBehaviour>();
+        if (playerCamera != null)
+            playerCamera.enabled = false;
+        
+        // Reset result text and wait for dice roll
+        if (UItext != null)
         {
-            Notification.text = $"({result})" + " Critical Success! The trophy imparts clues and wisdom";
+            UItext.text = "Click the button to roll the dice!";
+            UItext.color = Color.white;
         }
-        else if (result >= 12)
-        {
-            Notification.text = $"({result})" + " You have successfully interacted with the trophy! It imparts wisdom upon you";
-        }
-        else if (result <= 11 && result >= 2)
-        {
-            Notification.text = $"({result})" + " Failure, nothing happens";
-        }
-        else if (result == 1)
-        {
-            Notification.text = $"({result})" + " Critical failrue the trophy laughs at you";
-        }
+
+        yield return new WaitUntil(() => resultText.text != "");
+
+        PortalEvent(int.Parse(resultText.text));
+
+        yield return new WaitForSeconds(2f);
+
+        UItext.text = "";
+        isInteracting = false;
+        interactionUI?.SetActive(false);
+        playerCamera.enabled = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = true;
+
+
+        
+
     }
 
-    void PortalEvent()
+    void PortalEvent(int result)
     {
-        int result = DiceRoll();
+
+        
         if (result == 20)
         {
             Notification.text = $"({result})" + " You are teleported to a secret location!";
+            UItext.text = "Secret location discovered!";
+            UItext.color = Color.orange;
             TeleportPlayer(portalCPass);
         }
         else if (result >= 12)
         {
             Notification.text = $"({result})" + " You are teleported to another realm!";
+            UItext.text = "Tavern Entrance Discovered!";
+            UItext.color = Color.green;
             TeleportPlayer(portalPass);
         }
         else if (result <= 11 && result >= 2)
         {
             Notification.text = $"({result})" + " Failure, nothing happens";
+            UItext.text = "Failure, nothing happens.";
+            UItext.color = Color.white;
         }
         else if (result == 1)
         {
             Notification.text = $"({result})" + " You are teleported to the Transitive Planes";
+            UItext.text = "You have been sent to the Transitive Planes!";
+            UItext.color = Color.red;
             TeleportPlayer(portalCFail);
         }
     }
@@ -154,6 +189,7 @@ public class Character : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        interactionUI?.SetActive(false);
     }
 
     void Update()
@@ -206,7 +242,7 @@ public class Character : MonoBehaviour
         }
 
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && isInteracting == false)
             {
                 if(crossHairText.text == "Interact with portal?")
                 {
@@ -215,12 +251,11 @@ public class Character : MonoBehaviour
                         Notification.text = "Portal is offline.";
                     }
                     else{
-                        PortalEvent();
+                        StartCoroutine(WaitForUIButton());
                     }
                     
                 } else if(crossHairText.text == "Interact with trophy?")
                 {
-                    TrophyEvent();
                 } else if(crossHairText.text == "Interact to return home")
                 {
                     TeleportPlayer(PortalHome);
