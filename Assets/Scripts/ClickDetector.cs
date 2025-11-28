@@ -42,7 +42,7 @@ public class ClickDetector : MonoBehaviour
 
     void Update()
     {
-        // AR Touch input - works independently of gaze
+        // AR Touch input - works independently of gaze (like PerceptionCheck)
         if (enableTapInteraction && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
             CheckForARTouch(Input.GetTouch(0).position);
@@ -79,10 +79,22 @@ public class ClickDetector : MonoBehaviour
             rend.material = onMaterial;
         }
         
-        // Show tap feedback using UIManager's result text
+        // Show tap feedback in text - original functionality
+        if (playerText != null)
+        {
+            playerText.text = "Tapped: " + interactionText;
+            
+            // Clear the text after delay if not gazed
+            if (!isGazed)
+            {
+                Invoke("ClearText", tapTextDisplayTime);
+            }
+        }
+        
+        // Also show feedback in UIManager's result text
         if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
         {
-            UIManager.Instance.perceptionResultText.text = "Tapped: " + interactionText;
+            UIManager.Instance.perceptionResultText.text = "Interacted with: " + interactionText;
             UIManager.Instance.perceptionResultText.color = Color.blue;
             
             // Clear the text after delay if not gazed
@@ -93,19 +105,19 @@ public class ClickDetector : MonoBehaviour
         }
     }
 
+    void ClearText()
+    {
+        if (playerText != null && !isGazed)
+        {
+            playerText.text = "";
+        }
+    }
+    
     void ClearResultText()
     {
         if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null && !isGazed)
         {
             UIManager.Instance.perceptionResultText.text = "";
-        }
-    }
-
-    void ClearPlayerText()
-    {
-        if (playerText != null && !isGazed)
-        {
-            playerText.text = "";
         }
     }
 

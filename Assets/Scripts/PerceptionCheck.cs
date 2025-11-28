@@ -34,22 +34,34 @@ public class PerceptionCheck : MonoBehaviour
     private bool uiElementsSet = false;
     private XROrigin xrOrigin;
 
+    // In PerceptionCheck.cs - Add null checks
     void Start()
     {
         rend = GetComponent<Renderer>();
-        
-        // Find AR components
         FindARComponents();
         
-        // Register with UIManager to get UI references
+        // Register with UIManager - but UIManager might not be ready yet
         if (UIManager.Instance != null)
         {
             UIManager.Instance.RegisterPerceptionCheck(this);
+        }
+        else
+        {
+            // Retry registration if UIManager isn't ready
+            StartCoroutine(RegisterWhenReady());
         }
         
         interactionUI?.SetActive(false);
     }
 
+    IEnumerator RegisterWhenReady()
+    {
+        while (UIManager.Instance == null)
+        {
+            yield return new WaitForSeconds(0.1f);
+        }
+        UIManager.Instance.RegisterPerceptionCheck(this);
+    }
     void FindARComponents()
     {
         xrOrigin = FindAnyObjectByType<XROrigin>();
@@ -141,7 +153,7 @@ public class PerceptionCheck : MonoBehaviour
             UIManager.Instance.ShowInteractionUI();
         }
         
-        // Reset result text and wait for dice roll - USING UIMANAGER'S RESULT TEXT
+        // Reset result text and wait for dice roll
         if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
         {
             UIManager.Instance.perceptionResultText.text = "Tap the button to roll the dice!";
@@ -185,18 +197,38 @@ public class PerceptionCheck : MonoBehaviour
         
         if (diceRollResult == 20)
         {
-            // Find portal and reveal password
+            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText + "\n\nCritical Success!";
+            clueMessage = "Password revealed: Blue -> Yellow -> Red -> Green -> White";
+            resultColor = Color.yellow;
+            
+            // Find portal and reveal password - MORE ROBUST SEARCH
             PortalScript portal = FindAnyObjectByType<PortalScript>();
             if (portal != null)
             {
+                Debug.Log("PERCEPTION: Found portal! Calling RevealPassword()");
                 portal.RevealPassword();
             }
+            else
+            {
+                Debug.LogError("PERCEPTION: No PortalScript found in scene!");
+                // Try alternative search methods
+                GameObject portalObj = GameObject.FindGameObjectWithTag("Portal");
+                if (portalObj != null)
+                {
+                    portal = portalObj.GetComponent<PortalScript>();
+                    if (portal != null)
+                    {
+                        Debug.Log("PERCEPTION: Found portal via tag! Calling RevealPassword()");
+                        portal.RevealPassword();
+                    }
+                }
+            }
         }
-        else if (diceRollResult >= difficultyClass)
+        else if (diceRollResult >= difficultyClass) 
         {
             int index = Random.Range(0, clue.Length);
             resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText;
-            clueMessage = "Clue: " + clue[index];
+            clueMessage = "Clue: " + (index < clue.Length ? clue[index] : "No clue available");
             resultColor = Color.green;
         }
         else if(diceRollResult == 1)
@@ -244,8 +276,6 @@ public class PerceptionCheck : MonoBehaviour
         {
             rend.material = offMaterial;
             if (playerText != null) playerText.text = "";
-            if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
-                UIManager.Instance.perceptionResultText.text = "";
         }
     }
 }
