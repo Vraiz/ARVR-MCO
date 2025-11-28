@@ -778,7 +778,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 6aa06669df23ea949b0cedb8c337f735, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Change your die back to normal
+  interactionDisplayTime: 2
 --- !u!64 &3211047196229701502
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1579,7 +1582,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 88a75789a7eba0e4e94120e4817ffc22, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Change your die to only pass
+  interactionDisplayTime: 2
 --- !u!64 &3296775097604493788
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1708,7 +1714,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 6aa06669df23ea949b0cedb8c337f735, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Interact with blue die?
+  interactionDisplayTime: 2
 --- !u!64 &6847510589893336565
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1949,7 +1958,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 88a75789a7eba0e4e94120e4817ffc22, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Interact with green die?
+  interactionDisplayTime: 2
 --- !u!64 &3837645280569532066
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2212,7 +2224,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 880774007180850119, guid: c0afc8584ee560f4aa266511b0eb1fbb, type: 3}
   offMaterial: {fileID: 2100000, guid: 5af8ded1f8dfe144fa5184f7f5ff0394, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Interact to return home
+  interactionDisplayTime: 2
 --- !u!1 &2004889376551880118
 GameObject:
   m_ObjectHideFlags: 0
@@ -2431,7 +2446,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 4a292d62fcf40774f8497e0a0b77af0a, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Interact with yellow die?
+  interactionDisplayTime: 2
 --- !u!64 &4061604544438034316
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -4576,7 +4594,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 82ac445f9d671e248b168bacd589acc1, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Change your die to only roll 1s
+  interactionDisplayTime: 2
 --- !u!64 &4678123039955341867
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -5063,7 +5084,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 880774007180850119, guid: c0afc8584ee560f4aa266511b0eb1fbb, type: 3}
   offMaterial: {fileID: 2100000, guid: 5af8ded1f8dfe144fa5184f7f5ff0394, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Interact to return home
+  interactionDisplayTime: 2
 --- !u!1 &4770228722376434326
 GameObject:
   m_ObjectHideFlags: 0
@@ -6111,8 +6135,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5405319264629616352}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.46913, y: 0.31056273, z: 12.674097}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6134,7 +6158,7 @@ Transform:
   - {fileID: 6136738522771659892}
   - {fileID: 5310629079112192729}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &5500487843290774028
 GameObject:
   m_ObjectHideFlags: 0
@@ -6575,7 +6599,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 441c63b08d4cbfd488577d614c4840f5, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Change your die to roll only 20s
+  interactionDisplayTime: 2
 --- !u!1 &5888635478743739644
 GameObject:
   m_ObjectHideFlags: 0
@@ -7908,7 +7935,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 4a292d62fcf40774f8497e0a0b77af0a, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Change your die to only fail
+  interactionDisplayTime: 2
 --- !u!64 &653042810380707904
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -8507,7 +8537,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 880774007180850119, guid: c0afc8584ee560f4aa266511b0eb1fbb, type: 3}
   offMaterial: {fileID: 2100000, guid: 5af8ded1f8dfe144fa5184f7f5ff0394, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Interact to return home
+  interactionDisplayTime: 2
 --- !u!1 &7630412809116300833
 GameObject:
   m_ObjectHideFlags: 0
@@ -9235,7 +9268,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 82ac445f9d671e248b168bacd589acc1, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Interact with red die?
+  interactionDisplayTime: 2
 --- !u!64 &8169937741602306532
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -9392,10 +9428,9 @@ MonoBehaviour:
   notification: {fileID: 0}
   diceText: {fileID: 0}
   diceRoll: {fileID: 0}
-  difficultyClass: 15
-  passText: SUCCESS! You notice the taxidermy of this creature open its mouth as
-    it begins to impart its knowledge.
-  failText: FAILURE! The head laughs as you try to make sense of its nature.
+  difficultyClass: 10
+  passText: 
+  failText: 
   interactionUIDisplayTime: 2
   resultDisplayTime: 4
   clue:
@@ -9638,7 +9673,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
   offMaterial: {fileID: 2100000, guid: 441c63b08d4cbfd488577d614c4840f5, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Interact with white die?
+  interactionDisplayTime: 2
 --- !u!64 &5843653363522836322
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -10125,7 +10163,10 @@ MonoBehaviour:
   playerText: {fileID: 0}
   onMaterial: {fileID: 880774007180850119, guid: c0afc8584ee560f4aa266511b0eb1fbb, type: 3}
   offMaterial: {fileID: 2100000, guid: 5af8ded1f8dfe144fa5184f7f5ff0394, type: 2}
+  interactionUI: {fileID: 0}
+  resultText: {fileID: 0}
   interactionText: Interact with portal?
+  interactionDisplayTime: 2
 --- !u!1 &9164307668027756722
 GameObject:
   m_ObjectHideFlags: 0

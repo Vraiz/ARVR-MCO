@@ -406,7 +406,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ec864671dc11ef4bb3830edc1378b2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ARGazeDetector
-  diceRoll: {fileID: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,6 +562,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 345c4fab5fda3a042aef6c380e1a22d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  arCanvas: {fileID: 4113816517072674036}
+  arCamera: {fileID: 119235290}
   perceptionCheckText: {fileID: 3479313529549557532}
   perceptionInteractionUI: {fileID: 860748939958118499}
   perceptionResultText: {fileID: 3479313529549557532}
@@ -946,7 +947,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &945533239790039116
 GameObject:
   m_ObjectHideFlags: 0

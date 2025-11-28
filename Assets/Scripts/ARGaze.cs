@@ -1,13 +1,17 @@
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using System.Collections.Generic;
 
 public class ARGazeDetector : MonoBehaviour
 {
     private Camera arCamera;
     private GameObject currentGazedObject;
+    private ARRaycastManager arRaycastManager;
 
     void Start()
     {
         arCamera = Camera.main;
+        arRaycastManager = FindAnyObjectByType<ARRaycastManager>();
     }
 
     void Update()
@@ -17,8 +21,18 @@ public class ARGazeDetector : MonoBehaviour
 
     void DetectGazedObject()
     {
-        // Ray from center of screen for AR gaze
-        Ray ray = arCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+        // Use AR raycast for better AR detection
+        var screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        var hits = new List<ARRaycastHit>();
+        
+        // First try AR raycast for real-world surfaces
+        if (arRaycastManager.Raycast(screenCenter, hits, UnityEngine.XR.ARSubsystems.TrackableType.PlaneWithinPolygon))
+        {
+            // AR raycast hit - you could add AR-specific logic here
+        }
+        
+        // Then try physics raycast for virtual objects
+        Ray ray = arCamera.ScreenPointToRay(screenCenter);
         RaycastHit hit;
         
         if (Physics.Raycast(ray, out hit, 10f))

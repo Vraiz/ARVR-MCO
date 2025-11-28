@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.XR.ARFoundation;
+using Unity.XR.CoreUtils;
 
 public class PerceptionCheck : MonoBehaviour
 {
@@ -9,8 +11,6 @@ public class PerceptionCheck : MonoBehaviour
     public Material onMaterial;
     public Material offMaterial;
     public GameObject interactionUI;
-    public TMP_Text resultText;
-    public TMP_Text notification;
     public TMP_Text diceText;
     public DiceRoll diceRoll;
     
@@ -32,11 +32,14 @@ public class PerceptionCheck : MonoBehaviour
     private bool waitingForRoll = false;
     private Camera arCamera;
     private bool uiElementsSet = false;
+    private XROrigin xrOrigin;
 
     void Start()
     {
         rend = GetComponent<Renderer>();
-        arCamera = Camera.main;
+        
+        // Find AR components
+        FindARComponents();
         
         // Register with UIManager to get UI references
         if (UIManager.Instance != null)
@@ -45,6 +48,20 @@ public class PerceptionCheck : MonoBehaviour
         }
         
         interactionUI?.SetActive(false);
+    }
+
+    void FindARComponents()
+    {
+        xrOrigin = FindAnyObjectByType<XROrigin>();
+        if (xrOrigin != null)
+        {
+            arCamera = xrOrigin.Camera;
+        }
+        
+        if (arCamera == null)
+        {
+            arCamera = Camera.main;
+        }
     }
 
     void Update()
@@ -58,6 +75,8 @@ public class PerceptionCheck : MonoBehaviour
 
     void CheckForARTouch(Vector2 touchPosition)
     {
+        if (arCamera == null) return;
+
         Ray ray = arCamera.ScreenPointToRay(touchPosition);
         RaycastHit hit;
         
@@ -91,14 +110,12 @@ public class PerceptionCheck : MonoBehaviour
         }
     }
 
-    // ADD THIS METHOD TO FIX THE UIMANAGER ERROR
     public void SetUIReferences(TMP_Text newPlayerText, GameObject newInteractionUI, TMP_Text newResultText, DiceRoll newDiceRoll)
     {
         playerText = newPlayerText;
         interactionUI = newInteractionUI;
-        resultText = newResultText;
         diceRoll = newDiceRoll;
-        uiElementsSet = (playerText != null && interactionUI != null && resultText != null && diceRoll != null);
+        uiElementsSet = (playerText != null && interactionUI != null && diceRoll != null);
         
         if (uiElementsSet)
         {
@@ -117,16 +134,20 @@ public class PerceptionCheck : MonoBehaviour
         isInteracting = true;
         waitingForRoll = true;
         
-        // Show UI via UIManager
+        // Position UI in AR space
         if (UIManager.Instance != null)
-            UIManager.Instance.ShowInteractionUI();
-        
-        // Reset result text and wait for dice roll
-        if (resultText != null)
         {
-            resultText.text = "Tap the button to roll the dice!";
-            resultText.color = Color.white;
+            UIManager.Instance.PositionUIInWorldSpace(this.transform);
+            UIManager.Instance.ShowInteractionUI();
         }
+        
+        // Reset result text and wait for dice roll - USING UIMANAGER'S RESULT TEXT
+        if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
+        {
+            UIManager.Instance.perceptionResultText.text = "Tap the button to roll the dice!";
+            UIManager.Instance.perceptionResultText.color = Color.white;
+        }
+            
         if (diceText != null)
         {
             diceText.text = "";
@@ -158,30 +179,46 @@ public class PerceptionCheck : MonoBehaviour
     {
         waitingForRoll = false;
         
+        string resultMessage = "";
+        string clueMessage = "";
+        Color resultColor = Color.white;
+        
         if (diceRollResult == 20)
         {
-            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText + "\n\nCritical Success!";
-            if (notification != null) notification.text = "Password is Blue -> Yellow -> Red -> Green -> White";
-            resultText.color = Color.yellow;
+            // Find portal and reveal password
+            PortalScript portal = FindAnyObjectByType<PortalScript>();
+            if (portal != null)
+            {
+                portal.RevealPassword();
+            }
         }
         else if (diceRollResult >= difficultyClass)
         {
             int index = Random.Range(0, clue.Length);
-            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText;
-            if (notification != null) notification.text = clue[index];
-            resultText.color = Color.green;
+            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText;
+            clueMessage = "Clue: " + clue[index];
+            resultColor = Color.green;
         }
         else if(diceRollResult == 1)
         {
-            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText + "\n\nCritical Failure!";
-            if (notification != null) notification.text = "The trophy laughs at you";
-            resultText.color = Color.red;
+            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText + "\n\nCritical Failure!";
+            clueMessage = "The trophy laughs at you";
+            resultColor = Color.red;
         }
         else
         {
-            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText;
-            if (notification != null) notification.text = "";
-            resultText.color = Color.black;
+            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText;
+            clueMessage = "No clues revealed";
+            resultColor = Color.black;
+        }
+        
+        // Display result using UIManager's result text
+        if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
+        {
+            // Combine result and clue into one message
+            string fullMessage = resultMessage + "\n\n" + clueMessage;
+            UIManager.Instance.perceptionResultText.text = fullMessage;
+            UIManager.Instance.perceptionResultText.color = resultColor;
         }
         
         yield return new WaitForSeconds(interactionUIDisplayTime);
@@ -207,7 +244,8 @@ public class PerceptionCheck : MonoBehaviour
         {
             rend.material = offMaterial;
             if (playerText != null) playerText.text = "";
-            if (resultText != null) resultText.text = "";
+            if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
+                UIManager.Instance.perceptionResultText.text = "";
         }
     }
 }
