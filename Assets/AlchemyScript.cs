@@ -1,77 +1,91 @@
 using UnityEngine;
-using System.Collections;
+using TMPro;
+using UnityEngine.UI;
+
 
 public class AlchemyScript : MonoBehaviour
 {
-    public GameObject spherePrefab; // Assign a small transparent sphere prefab
-    public int numberOfSpheres = 5; // How many spheres to spawn
-    public float riseHeight = 2f; // How high they rise
-    public float duration = 1f; // How long before they disappear
-    public float spread = 0.5f; // Random horizontal spread
+    
+    public TMP_Text playerText;
+    public Material onMaterial;
+    public Material offMaterial;
+
+    public string interactionText;
+
+    public GameObject floatingPrefab;
+
+    private Renderer rend;
+
+    public int spawnCount = 5;
+    public float floatSpeed = 1.5f;
+    public float spawnSpread = 0.2f;
+    private GameObject selectionText;
+
+
+    void Bubbles()
+    {
+        Debug.Log("bubbles");
+        for (int i = 0; i < spawnCount; i++)
+        {
+            Vector3 spawnPos = transform.position +
+                new Vector3(
+                    Random.Range(-spawnSpread, spawnSpread),
+                    0,
+                    Random.Range(-spawnSpread, spawnSpread)
+                );
+
+            GameObject obj = Instantiate(floatingPrefab, spawnPos, Quaternion.identity);
+            obj.AddComponent<FloatingUp>();
+            obj.GetComponent<FloatingUp>().speed = floatSpeed;
+        }
+    }
+
+    void Start()
+    {
+        selectionText = GameObject.Find("SelectionText");
+
+        if (selectionText == null)
+        {
+        } else
+        {
+            playerText = selectionText.GetComponent<TextMeshProUGUI>();
+        }
+        rend = GetComponent<Renderer>();
+    }
+    void OnMouseEnter()
+    {
+        rend.material = onMaterial;
+        playerText.text = interactionText;
+
+    }
+
+    void OnMouseExit()
+    {
+        {
+            rend.material = offMaterial;
+            playerText.text = "";
+        }
+
+    }
 
     void Update()
     {
-        // Handle touch input
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (Input.GetMouseButtonDown(0) && playerText.text == interactionText)
         {
-            DetectTouch(Input.GetTouch(0).position);
-        }
-
-        // Handle mouse click for testing in Editor
-        if (Input.GetMouseButtonDown(0))
-        {
-            DetectTouch(Input.mousePosition);
+            Bubbles();
         }
     }
+}
 
-    void DetectTouch(Vector2 screenPos)
+public class FloatingUp : MonoBehaviour
+{
+    public float speed = 1f;
+
+    void Update()
     {
-        Ray ray = Camera.main.ScreenPointToRay(screenPos);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
-        {
-            if (hit.transform == transform)
-            {
-                SpawnSpheres();
-            }
-        }
-    }
+        transform.position += Vector3.up * speed * Time.deltaTime;
 
-    void SpawnSpheres()
-    {
-        for (int i = 0; i < numberOfSpheres; i++)
-        {
-            Vector3 randomOffset = new Vector3(
-                Random.Range(-spread, spread),
-                0,
-                Random.Range(-spread, spread)
-            );
-            GameObject sphere = Instantiate(spherePrefab, transform.position + randomOffset, Quaternion.identity);
-            StartCoroutine(RiseAndDisappear(sphere));
-        }
-    }
-
-    IEnumerator RiseAndDisappear(GameObject sphere)
-    {
-        Vector3 startPos = sphere.transform.position;
-        Vector3 endPos = startPos + Vector3.up * riseHeight;
-        float elapsed = 0f;
-
-        // Optional: fade out
-        Renderer rend = sphere.GetComponent<Renderer>();
-        Color startColor = rend.material.color;
-
-        while (elapsed < duration)
-        {
-            float t = elapsed / duration;
-            sphere.transform.position = Vector3.Lerp(startPos, endPos, t);
-            if (rend != null)
-                rend.material.color = new Color(startColor.r, startColor.g, startColor.b, Mathf.Lerp(startColor.a, 0, t));
-
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        Destroy(sphere);
+        if (transform.position.y > 20f) // Prevent infinite objects in scene
+            Destroy(gameObject);
     }
 }

@@ -16,70 +16,56 @@ public class ClickDetector : MonoBehaviour
     public ARRaycastManager raycastManager;
     private List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
+    Camera cam;
+
+    public GameObject selectionText;
+
+
 
     void Start()
     {
+        selectionText = GameObject.Find("SelectionText");
+
+        if (selectionText == null)
+        {
+        } else
+        {
+            playerText = selectionText.GetComponent<TextMeshProUGUI>();
+        }
+            
         rend = GetComponent<Renderer>();
+        cam = Camera.main;
     }
 
         
     void Update()
     {
-        if (playerText == null) // Only search if not already assigned
-        {
-            playerText = FindObjectOfType<TextMeshPro>();
-            if (playerText != null && playerText.gameObject.name == "SelectionText")
-            {
-                
-            }
-            else
-            {
-                playerText = null; // Reset if not the correct one
-            }
-        }
+
 
         if (raycastManager == null)
         {
             raycastManager = FindObjectOfType<ARRaycastManager>();
             if (raycastManager != null)
             {
-                Debug.Log("Found ARRaycastManager");
             }
             else
             {
-                Debug.Log("ARRaycastManager not found");
             }
         }
 
-        if (Input.touchCount > 0) // Check if there's a touch
+        if (Input.GetMouseButtonDown(0))
         {
-            Touch touch = Input.GetTouch(0);
-
-            // Convert touch position to a ray
-            Ray ray = Camera.main.ScreenPointToRay(touch.position);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                if (hit.collider.gameObject == gameObject) // Did we touch THIS object?
+                if (hit.transform == transform)
                 {
-                    if (touch.phase == TouchPhase.Began)
-                    {
-                        rend.material = onMaterial;
-                        playerText.text = interactionText;
-                    }
-                    else if (touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved)
-                    {
-                        rend.material = onMaterial;
-                        playerText.text = interactionText;
-                    }
-                    else if (touch.phase == TouchPhase.Ended)
-                    {
-                        playerText.text = "";
-                    }
+                    rend.material = onMaterial;
+                    playerText.text = interactionText;
                 }
             }
         }
+
     }
     void OnMouseEnter()
     {

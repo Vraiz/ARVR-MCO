@@ -1,42 +1,57 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
 public class TrackedImageSpawner : MonoBehaviour
 {
-    public ARTrackedImageManager trackedImageManager;
-    public GameObject prefab;
+    public ARTrackedImageManager trackedImages;
+    public GameObject[] ArPrefabs;
 
-    private void OnEnable()
+    List<GameObject> ARObjects = new List<GameObject>();
+
+    
+
+    void OnEnable()
     {
-        trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
+        trackedImages.trackedImagesChanged += OnTrackedImagesChanged;
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
-        trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+        trackedImages.trackedImagesChanged -= OnTrackedImagesChanged;
     }
 
-    private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
+
+    // Event Handler
+    private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
     {
-        // Spawn new prefabs when tracked images are detected
-        foreach (var trackedImage in args.added)
+        //Create object based on image tracked
+        foreach (var trackedImage in eventArgs.added)
         {
-            var obj = Instantiate(prefab, trackedImage.transform);
-            obj.transform.localPosition = Vector3.zero;
-            obj.transform.localRotation = Quaternion.identity;
+            foreach (var arPrefab in ArPrefabs)
+            {
+                if(trackedImage.referenceImage.name == arPrefab.name)
+                {
+                    var newPrefab = Instantiate(arPrefab, trackedImage.transform);
+                    ARObjects.Add(newPrefab);
+                }
+            }
         }
-
-        // Optionally, handle updated tracking (e.g., hide when not visible)
-        foreach (var trackedImage in args.updated)
+        
+        //Update tracking position
+        foreach (var trackedImage in eventArgs.updated)
         {
-            trackedImage.gameObject.SetActive(trackedImage.trackingState == UnityEngine.XR.ARSubsystems.TrackingState.Tracking);
+            foreach (var gameObject in ARObjects)
+            {
+                if(gameObject.name == trackedImage.name)
+                {
+                    gameObject.SetActive(trackedImage.trackingState == TrackingState.Tracking);
+                }
+            }
         }
-
-        // Remove objects for removed tracked images
-        foreach (var trackedImage in args.removed)
-        {
-            Destroy(trackedImage.gameObject);
-        }
+        
     }
 }
-

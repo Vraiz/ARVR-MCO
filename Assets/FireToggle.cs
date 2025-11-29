@@ -14,6 +14,7 @@ public class FireToggle : MonoBehaviour
     public bool isLit = false;
     private Renderer rend;
 
+    private GameObject selectionText;
     void ToggleFire()
     {
         if (isLit == true)
@@ -27,6 +28,14 @@ public class FireToggle : MonoBehaviour
     }
     void Start()
     {
+        selectionText = GameObject.Find("SelectionText");
+
+        if (selectionText == null)
+        {
+        } else
+        {
+            playerText = selectionText.GetComponent<TextMeshProUGUI>();
+        }
         rend = GetComponent<Renderer>();
     }
     void OnMouseEnter()

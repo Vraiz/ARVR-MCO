@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &5066867215863496855
+--- !u!1001 &2320811466341594639
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -22,15 +22,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.83424854
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.61166096
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -66,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_Name
-      value: animar
+      value: animar 1
       objectReference: {fileID: 0}
     - target: {fileID: 6850882436549574912, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_Intensity
@@ -90,48 +90,23 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2407168575347375919}
+      addedObject: {fileID: 7879601120058910352}
     - targetCorrespondingSourceObject: {fileID: 9152363913774390056, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1808263161035255988}
+      addedObject: {fileID: 439228682824118806}
   m_SourcePrefab: {fileID: 100100000, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
---- !u!1 &4130533819469896639 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9152363913774390056, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
-  m_PrefabInstance: {fileID: 5066867215863496855}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1808263161035255988
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4130533819469896639}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c80256b202e70469512d7f1c4a40dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AlchemyScripts
-  playerText: {fileID: 0}
-  onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
-  offMaterial: {fileID: 2295699958525706655, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
-  interactionText: Interact with table
-  floatingPrefab: {fileID: 6512925189758077209, guid: a185a0ab9e2019340b126d0f1b0a2641, type: 3}
-  spawnCount: 5
-  floatSpeed: 1.5
-  spawnSpread: 0.2
---- !u!1 &5372874837931916742 stripped
+--- !u!1 &3239289255754500958 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
-  m_PrefabInstance: {fileID: 5066867215863496855}
+  m_PrefabInstance: {fileID: 2320811466341594639}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2407168575347375919
+--- !u!114 &7879601120058910352
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5372874837931916742}
+  m_GameObject: {fileID: 3239289255754500958}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d2c80256b202e70469512d7f1c4a40dd, type: 3}
@@ -141,6 +116,31 @@ MonoBehaviour:
   onMaterial: {fileID: 0}
   offMaterial: {fileID: 0}
   interactionText: 
+  floatingPrefab: {fileID: 6512925189758077209, guid: a185a0ab9e2019340b126d0f1b0a2641, type: 3}
+  spawnCount: 5
+  floatSpeed: 1.5
+  spawnSpread: 0.2
+--- !u!1 &6860837965419113767 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9152363913774390056, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
+  m_PrefabInstance: {fileID: 2320811466341594639}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &439228682824118806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6860837965419113767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2c80256b202e70469512d7f1c4a40dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AlchemyScripts
+  playerText: {fileID: 0}
+  onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
+  offMaterial: {fileID: 2295699958525706655, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
+  interactionText: Interact with table
   floatingPrefab: {fileID: 6512925189758077209, guid: a185a0ab9e2019340b126d0f1b0a2641, type: 3}
   spawnCount: 5
   floatSpeed: 1.5
