@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.XR.ARFoundation;
 using Unity.XR.CoreUtils;
+using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
@@ -14,13 +15,14 @@ public class UIManager : MonoBehaviour
     [Header("Perception Check UI Elements")]
     public TMP_Text perceptionCheckText;
     public GameObject perceptionInteractionUI;
-    public TMP_Text perceptionResultText;
+    public TMP_Text perceptionResultText; // KEEP THIS FOR PORTALSCRIPT
     public DiceRoll perceptionDiceRoll;
 
     [Header("Dice Roll Target")]
     public string perceptionCheckName;
 
     private XROrigin xrOrigin;
+    private Coroutine currentMessageCoroutine;
 
     void Awake()
     {
@@ -34,21 +36,11 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("UIManager Instance already exists, destroying duplicate");
             Destroy(gameObject);
             return;
         }
         
-        // Find AR components
         FindARComponents();
-        
-        // Log the state of UI elements
-        Debug.Log($"perceptionCheckText: {perceptionCheckText != null}");
-        Debug.Log($"perceptionInteractionUI: {perceptionInteractionUI != null}");
-        Debug.Log($"perceptionResultText: {perceptionResultText != null}");
-        Debug.Log($"perceptionDiceRoll: {perceptionDiceRoll != null}");
-        
-        // Disable all UI at start
         SetAllUIActive(false);
     }
 
@@ -58,13 +50,11 @@ public class UIManager : MonoBehaviour
         if (xrOrigin != null)
         {
             arCamera = xrOrigin.Camera;
-            Debug.Log($"Found XR Origin and camera: {arCamera != null}");
         }
         
         if (arCamera == null)
         {
             arCamera = Camera.main;
-            Debug.Log($"Using main camera: {arCamera != null}");
         }
     }
 
@@ -79,7 +69,6 @@ public class UIManager : MonoBehaviour
             Debug.Log($"Set perception check name: {perceptionCheckName}");
         }
         
-        // Setup AR canvas if available
         SetupARCanvas();
     }
 
@@ -87,7 +76,6 @@ public class UIManager : MonoBehaviour
     {
         if (arCanvas != null)
         {
-            // Set canvas to work with AR
             arCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
             arCanvas.worldCamera = arCamera;
             Debug.Log("AR Canvas setup complete");
@@ -108,6 +96,56 @@ public class UIManager : MonoBehaviour
             perceptionCheck.SetUIReferences(perceptionCheckText, perceptionInteractionUI, perceptionResultText, perceptionDiceRoll);
             Debug.Log("PerceptionCheck UI references set");
         }
+    }
+
+    // UNIVERSAL UI METHODS - For any interactable object
+    public void ShowInteractionHint(string hint)
+    {
+        if (perceptionCheckText != null)
+        {
+            perceptionCheckText.text = hint;
+        }
+    }
+
+    public void ClearInteractionHint()
+    {
+        if (perceptionCheckText != null)
+        {
+            perceptionCheckText.text = "";
+        }
+    }
+
+    // ShowMessage method for MaterialResizeOnClick and other scripts
+    public void ShowMessage(string message, Color color, float displayTime = 3f)
+    {
+        if (perceptionResultText != null)
+        {
+            perceptionResultText.text = message;
+            perceptionResultText.color = color;
+            ShowInteractionUI();
+            
+            // Cancel previous message if any
+            if (currentMessageCoroutine != null)
+                StopCoroutine(currentMessageCoroutine);
+                
+            currentMessageCoroutine = StartCoroutine(HideMessageAfterDelay(displayTime));
+        }
+    }
+
+    private IEnumerator HideMessageAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        HideInteractionUI();
+    }
+
+    public void ShowInteractionUI()
+    {
+        SetAllUIActive(true);
+    }
+
+    public void HideInteractionUI()
+    {
+        SetAllUIActive(false);
     }
 
     public void SetAllUIActive(bool active)
@@ -132,19 +170,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void ShowInteractionUI()
-    {
-        Debug.Log("ShowInteractionUI called");
-        SetAllUIActive(true);
-    }
-
-    public void HideInteractionUI()
-    {
-        Debug.Log("HideInteractionUI called");
-        SetAllUIActive(false);
-    }
-
-    // Method to position UI in world space for AR
     public void PositionUIInWorldSpace(Transform targetTransform, float distance = 1f)
     {
         if (arCanvas != null && arCamera != null)
