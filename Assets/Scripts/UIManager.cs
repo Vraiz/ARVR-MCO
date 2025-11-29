@@ -1,3 +1,4 @@
+//UIManager.cs
 using UnityEngine;
 using TMPro;
 using UnityEngine.XR.ARFoundation;
@@ -17,6 +18,9 @@ public class UIManager : MonoBehaviour
     public GameObject perceptionInteractionUI;
     public TMP_Text perceptionResultText; // KEEP THIS FOR PORTALSCRIPT
     public DiceRoll perceptionDiceRoll;
+    
+    [Header("New Roll Type Display")]
+    public TMP_Text rollTypeText; // Add this field
 
     [Header("Dice Roll Target")]
     public string perceptionCheckName;
@@ -86,6 +90,24 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    // NEW METHOD: Set Roll Type Text
+    public void SetRollType(string rollType)
+    {
+        if (rollTypeText != null)
+        {
+            rollTypeText.text = rollType;
+        }
+    }
+
+    // NEW METHOD: Clear Roll Type Text
+    public void ClearRollType()
+    {
+        if (rollTypeText != null)
+        {
+            rollTypeText.text = "";
+        }
+    }
+
     public void RegisterPerceptionCheck(PerceptionCheck perceptionCheck)
     {
         Debug.Log($"Registering PerceptionCheck: {perceptionCheck != null}");
@@ -116,28 +138,51 @@ public class UIManager : MonoBehaviour
     }
 
     // ShowMessage method for MaterialResizeOnClick and other scripts
+    // In UIManager.cs, update the ShowMessage method to be more robust:
     public void ShowMessage(string message, Color color, float displayTime = 3f)
     {
         if (perceptionResultText != null)
         {
             perceptionResultText.text = message;
             perceptionResultText.color = color;
-            ShowInteractionUI();
+            
+            // Show ONLY the result text, not the full interaction UI
+            if (perceptionInteractionUI != null)
+            {
+                // Hide the main UI but keep result text visible
+                perceptionInteractionUI.SetActive(false);
+            }
+            
+            // Make sure result text is active
+            perceptionResultText.gameObject.SetActive(true);
             
             // Cancel previous message if any
             if (currentMessageCoroutine != null)
                 StopCoroutine(currentMessageCoroutine);
                 
             currentMessageCoroutine = StartCoroutine(HideMessageAfterDelay(displayTime));
+            Debug.Log("Message shown: " + message);
+        }
+        else
+        {
+            Debug.LogError("perceptionResultText is null in UIManager!");
         }
     }
 
+    
     private IEnumerator HideMessageAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        HideInteractionUI();
+        
+        // Hide the result text
+        if (perceptionResultText != null)
+        {
+            perceptionResultText.text = "";
+            perceptionResultText.gameObject.SetActive(false);
+        }
+        
+        ClearRollType();
     }
-
     public void ShowInteractionUI()
     {
         SetAllUIActive(true);
@@ -146,6 +191,7 @@ public class UIManager : MonoBehaviour
     public void HideInteractionUI()
     {
         SetAllUIActive(false);
+        ClearRollType(); // Clear roll type when hiding UI
     }
 
     public void SetAllUIActive(bool active)
@@ -167,6 +213,11 @@ public class UIManager : MonoBehaviour
                 perceptionResultText.text = "";
             else
                 Debug.LogWarning("perceptionResultText is null in SetAllUIActive");
+                
+            if (rollTypeText != null)
+                rollTypeText.text = "";
+            else
+                Debug.LogWarning("rollTypeText is null in SetAllUIActive");
         }
     }
 

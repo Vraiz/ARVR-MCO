@@ -1899,7 +1899,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 937333847467369549}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05c1d83fb57cdd640bfe7099f085d62c, type: 3}
   m_Name: 
@@ -7632,8 +7632,10 @@ MonoBehaviour:
   expandedYScale: 0.6
   collapsedYScale: 0.1
   resizeDuration: 0.5
-  clickMessage: The water flows with magic...
-  messageDisplayTime: 3
+  difficultyClass: 12
+  successMessage: Arcana Check Passed! The water flows with magic...
+  failMessage: Arcana Check Failed! The magic remains dormant.
+  waitingForRoll: 1
 --- !u!1 &4266361133556619071
 GameObject:
   m_ObjectHideFlags: 0

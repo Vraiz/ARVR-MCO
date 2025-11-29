@@ -1,26 +1,29 @@
+//MaterialResizeOnClick.cs
 using UnityEngine;
 using System.Collections;
 
 public class MaterialResizeOnClick : MonoBehaviour
 {
     [Header("Resize Settings")]
-    public GameObject objectToResize; // Drag the object you want to resize here
+    public GameObject objectToResize;
     public float expandedYScale = 0.6f;
     public float collapsedYScale = 0.1f;
     public float resizeDuration = 0.5f;
     
-    [Header("UI Message")]
-    public string clickMessage = "The water flows with magic...";
+    [Header("Arcana Check Settings")]
+    public int difficultyClass = 12;
+    public string successMessage = "Arcana Check Passed! The water flows with magic...";
+    public string failMessage = "Arcana Check Failed! The magic remains dormant.";
     
     private Vector3 originalScale;
     private Vector3 targetScale;
     private bool isExpanded = true;
     private bool isResizing = false;
+    public bool waitingForRoll = false; // CHANGED TO PUBLIC
     private float resizeTimer = 0f;
 
     void Start()
     {
-        // If no object is assigned, use this object
         if (objectToResize == null)
         {
             objectToResize = this.gameObject;
@@ -34,7 +37,6 @@ public class MaterialResizeOnClick : MonoBehaviour
 
     void Update()
     {
-        // Handle resize animation
         if (isResizing && objectToResize != null)
         {
             resizeTimer += Time.deltaTime;
@@ -51,16 +53,85 @@ public class MaterialResizeOnClick : MonoBehaviour
         }
     }
 
-    // This gets called by ARGazeDetector when object is tapped
     public void HandleClick()
     {
-        Debug.Log("✓ CLICK DETECTED on: " + gameObject.name + " (will resize: " + (objectToResize != null ? objectToResize.name : "NULL") + ")");
+        Debug.Log("✓ CLICK DETECTED on: " + gameObject.name);
         
-        // Toggle size
-        ToggleSize();
+        // Start arcana check process
+        StartArcanaCheck();
+    }
+
+    void StartArcanaCheck()
+    {
+        if (UIManager.Instance != null)
+        {
+            // Set roll type FIRST before showing UI
+            UIManager.Instance.SetRollType("Arcana Check");
+            UIManager.Instance.PositionUIInWorldSpace(this.transform);
+            UIManager.Instance.ShowInteractionUI();
+            
+            // Set up UI for dice roll
+            if (UIManager.Instance.perceptionResultText != null)
+            {
+                UIManager.Instance.perceptionResultText.text = "Tap the button to roll for Arcana Check!";
+                UIManager.Instance.perceptionResultText.color = Color.white;
+            }
+            
+            waitingForRoll = true;
+            Debug.Log("Arcana check started - waiting for dice roll");
+        }
+        else
+        {
+            Debug.LogError("UIManager.Instance is null in StartArcanaCheck!");
+        }
+    }
+
+    // This method will be called by a dice roll button
+    public void ProcessArcanaCheck(int diceRoll)
+    {
+        if (!waitingForRoll) 
+        {
+            Debug.Log("Arcana check not waiting for roll");
+            return;
+        }
         
-        // Show message
-        ShowMessage();
+        waitingForRoll = false;
+        bool success = diceRoll >= difficultyClass;
+        
+        Debug.Log($"Arcana Check: Rolled {diceRoll} vs DC {difficultyClass} - {(success ? "SUCCESS" : "FAIL")}");
+        
+        // HIDE the dice roll UI but KEEP the result text visible
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.HideInteractionUI(); // This hides the roll button but keeps result text
+        }
+        
+        string resultMessage = "";
+        Color resultColor = Color.white;
+        
+        if (success)
+        {
+            ToggleSize();
+            resultMessage = $"Roll: {diceRoll} (DC: {difficultyClass})\n\n{successMessage}";
+            resultColor = Color.green;
+        }
+        else
+        {
+            resultMessage = $"Roll: {diceRoll} (DC: {difficultyClass})\n\n{failMessage}";
+            resultColor = Color.red;
+        }
+        
+        ShowMessage(resultMessage, resultColor);
+    }    
+
+private IEnumerator HideAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.HideInteractionUI();
+            UIManager.Instance.ClearRollType();
+        }
     }
 
     void ToggleSize()
@@ -84,27 +155,39 @@ public class MaterialResizeOnClick : MonoBehaviour
         resizeTimer = 0f;
     }
 
-    void ShowMessage()
+    void ShowMessage(string message, Color color)
     {
         if (UIManager.Instance != null)
         {
-            UIManager.Instance.ShowMessage(clickMessage, Color.cyan, 3f);
-            Debug.Log("Message shown: " + clickMessage);
+            // Use ShowMessage which will handle the UI properly
+            // This will show the message for 3 seconds then hide everything
+            UIManager.Instance.ShowMessage(message, color, 3f);
+            Debug.Log("Arcana Check Message shown: " + message);
         }
         else
         {
             Debug.LogError("UIManager.Instance is null!");
         }
     }
-
     // Gaze methods
     public void OnGazeEnter()
     {
         Debug.Log("Gaze enter: " + gameObject.name);
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.SetRollType("Arcana Check");
+            // Also show hint text
+            UIManager.Instance.ShowInteractionHint("Tap for Arcana Check (DC: " + difficultyClass + ")");
+        }
     }
 
     public void OnGazeExit()
     {
         Debug.Log("Gaze exit: " + gameObject.name);
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ClearRollType();
+            UIManager.Instance.ClearInteractionHint();
+        }
     }
 }

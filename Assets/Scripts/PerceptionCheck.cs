@@ -1,3 +1,4 @@
+//PerceptionCheck.cs
 using UnityEngine;
 using TMPro;
 using System.Collections;
@@ -29,7 +30,7 @@ public class PerceptionCheck : MonoBehaviour
     
     private Renderer rend;
     private bool isInteracting = false;
-    private bool waitingForRoll = false;
+    public bool waitingForRoll = false;
     private Camera arCamera;
     private bool uiElementsSet = false;
     private XROrigin xrOrigin;
@@ -145,6 +146,11 @@ public class PerceptionCheck : MonoBehaviour
 
         isInteracting = true;
         waitingForRoll = true;
+        
+         if (UIManager.Instance != null)
+        {
+            UIManager.Instance.SetRollType("Perception Check");
+        }
         
         // Position UI in AR space
         if (UIManager.Instance != null)

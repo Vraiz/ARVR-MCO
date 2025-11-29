@@ -1,3 +1,4 @@
+//ARGAZE.cs
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
@@ -82,6 +83,8 @@ public class ARGazeDetector : MonoBehaviour
         }
     }
 
+    // In ARGaze.cs, update the CallGazeEnter and CallGazeExit methods:
+
     void CallGazeEnter(GameObject obj)
     {
         MaterialResizeOnClick resize = obj.GetComponent<MaterialResizeOnClick>();
@@ -91,7 +94,13 @@ public class ARGazeDetector : MonoBehaviour
             return;
         }
         
-        // Your other gaze enter calls...
+        // Add PerceptionCheck gaze handling
+        PerceptionCheck perception = obj.GetComponent<PerceptionCheck>();
+        if (perception != null)
+        {
+            perception.OnGazeEnter();
+            return;
+        }
     }
 
     void CallGazeExit(GameObject obj)
@@ -103,6 +112,12 @@ public class ARGazeDetector : MonoBehaviour
             return;
         }
         
-        // Your other gaze exit calls...
+        // Add PerceptionCheck gaze handling
+        PerceptionCheck perception = obj.GetComponent<PerceptionCheck>();
+        if (perception != null)
+        {
+            perception.OnGazeExit();
+            return;
+        }
     }
 }
