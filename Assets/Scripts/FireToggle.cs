@@ -1,66 +1,28 @@
 using UnityEngine;
 using TMPro;
 
-public class FireToggle : MonoBehaviour
+public class FireToggle : ARInteractable
 {
-    public TMP_Text playerText;
-    public Material onMaterial;
-    public Material offMaterial;
+    [Header("Fire Settings")]
     public Material fireMaterial;
-    public string interactionText;
     public bool isLit = false;
     
-    private Renderer rend;
-    private Camera arCamera;
-    private bool isGazed = false;
-
-    void Start()
+    // Changed from protected to public to match base class
+    public override void HandleInteraction()
     {
-        rend = GetComponent<Renderer>();
-        arCamera = Camera.main;
-    }
-
-    void Update()
-    {
-        // AR Touch input
-        if (isGazed && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-        {
-            ToggleFire();
-        }
+        ToggleFire();
     }
 
     void ToggleFire()
     {
         isLit = !isLit;
-        if (isLit)
-        {
-            rend.material = fireMaterial;
-        }
-        else
-        {
-            rend.material = offMaterial;
-        }
+        rend.material = isLit ? fireMaterial : offMaterial;
     }
 
-    // AR Gaze methods
-    public void OnGazeEnter()
+    public override void OnGazeExit()
     {
-        isGazed = true;
-        rend.material = onMaterial;
-        playerText.text = interactionText;
-    }
-
-    public void OnGazeExit()
-    {
-        isGazed = false;
-        if (isLit)
-        {
-            rend.material = fireMaterial;
-        }
-        else
-        {
-            rend.material = offMaterial;
-        }
-        playerText.text = "";
+        base.OnGazeExit();
+        if (isInteracting) return;
+        rend.material = isLit ? fireMaterial : offMaterial;
     }
 }

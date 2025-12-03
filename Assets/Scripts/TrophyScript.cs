@@ -1,28 +1,17 @@
 using UnityEngine;
 using TMPro;
 
-public class TrophyScript : MonoBehaviour
+public class TrophyScript : ARInteractable
 {
-    public TMP_Text playerText;
-    public Material onMaterial;
-    public Material offMaterial;
-    private Renderer rend;
-
-    void Start()
+    // Changed from protected to public to match base class
+    public override void HandleInteraction()
     {
-        rend = GetComponent<Renderer>();
-    }
-
-    // AR Gaze methods
-    public void OnGazeEnter()
-    {
-        rend.material = onMaterial;
-        playerText.text = "Interact with trophy?";
-    }
-
-    public void OnGazeExit()
-    {
-        rend.material = offMaterial;
-        playerText.text = "";
+        // Trophy-specific interaction
+        Debug.Log("Trophy interacted with!");
+        
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowMessage("You examine the trophy closely...", Color.yellow, 2f);
+        }
     }
 }

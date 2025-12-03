@@ -1,4 +1,3 @@
-//DiceRoll.cs
 using UnityEngine;
 using TMPro;
 
@@ -6,33 +5,23 @@ public class DiceRoll : MonoBehaviour
 {
     public TMP_Text displayText;
     public int diceSides = 20;
-    public string perceptionCheckObjectName;
     
     private PerceptionCheck perceptionCheck;
-    private MaterialResizeOnClick arcanaCheck;
+    private MaterialResizeOnClick[] arcanaChecks;
 
     void Start()
     {
         if (displayText != null)
             displayText.text = "";
         
-        FindPerceptionCheckByName();
+        FindInteractableChecks();
     }
 
-    void FindPerceptionCheckByName()
+    void FindInteractableChecks()
     {
-        if (!string.IsNullOrEmpty(perceptionCheckObjectName))
-        {
-            GameObject perceptionObj = GameObject.Find(perceptionCheckObjectName);
-            if (perceptionObj != null)
-            {
-                perceptionCheck = perceptionObj.GetComponent<PerceptionCheck>();
-                if (perceptionCheck != null)
-                {
-                    Debug.Log($"DiceRoll connected to: {perceptionCheckObjectName}");
-                }
-            }
-        }
+        // Find all potential dice checkable objects
+        perceptionCheck = FindAnyObjectByType<PerceptionCheck>();
+        arcanaChecks = FindObjectsByType<MaterialResizeOnClick>(FindObjectsSortMode.None);
     }
 
     public void GenerateRandomNumber()
@@ -44,28 +33,36 @@ public class DiceRoll : MonoBehaviour
         
         Debug.Log($"Dice rolled: {randomNumber}");
         
-        // Try MaterialResizeOnClick (Arcana Check) FIRST - check if any are waiting
-        MaterialResizeOnClick[] arcanaChecks = FindObjectsByType<MaterialResizeOnClick>(FindObjectsSortMode.None);
-        foreach (MaterialResizeOnClick check in arcanaChecks)
+        // Use UIManager to handle the dice roll
+        if (UIManager.Instance != null)
         {
-            if (check.waitingForRoll)
+            UIManager.Instance.HandleDiceRoll(randomNumber);
+        }
+        else
+        {
+            // Fallback handling
+            HandleDiceRollFallback(randomNumber);
+        }
+    }
+
+    void HandleDiceRollFallback(int randomNumber)
+    {
+        // Try MaterialResizeOnClick (Arcana Check) first
+        if (arcanaChecks != null)
+        {
+            foreach (MaterialResizeOnClick check in arcanaChecks)
             {
-                Debug.Log($"Found waiting arcana check: {check.gameObject.name}");
-                check.ProcessArcanaCheck(randomNumber);
-                return;
+                if (check.IsWaitingForRoll)
+                {
+                    Debug.Log($"Found waiting arcana check: {check.gameObject.name}");
+                    check.ProcessDiceRoll(randomNumber);
+                    return;
+                }
             }
         }
         
-        // Try PerceptionCheck second
-        if (perceptionCheck != null && perceptionCheck.waitingForRoll)
-        {
-            perceptionCheck.ProcessDiceRoll();
-            return;
-        }
-        
-        // Fallback: try to find perception check again
-        FindPerceptionCheckByName();
-        if (perceptionCheck != null && perceptionCheck.waitingForRoll)
+        // Try PerceptionCheck
+        if (perceptionCheck != null && perceptionCheck.IsWaitingForRoll)
         {
             perceptionCheck.ProcessDiceRoll();
             return;
@@ -76,7 +73,7 @@ public class DiceRoll : MonoBehaviour
 
     public void SetPerceptionCheckName(string newName)
     {
-        perceptionCheckObjectName = newName;
-        FindPerceptionCheckByName();
+        // This method is kept for compatibility with UIManager
+        FindInteractableChecks();
     }
 }

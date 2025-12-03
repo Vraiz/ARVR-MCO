@@ -1,4 +1,3 @@
-//ObjectDisable.cs
 using UnityEngine;
 
 public class ObjectDisabler : MonoBehaviour
@@ -9,21 +8,12 @@ public class ObjectDisabler : MonoBehaviour
     [Header("Action Type")]
     public bool disableObject = true;
     
-    // Simple method that works with Unity's Button OnClick()
     public void ExecuteDisable()
     {
         if (targetObject != null)
         {
-            if (disableObject)
-            {
-                targetObject.SetActive(false);
-                Debug.Log("Disabled: " + targetObject.name);
-            }
-            else
-            {
-                targetObject.SetActive(true);
-                Debug.Log("Enabled: " + targetObject.name);
-            }
+            targetObject.SetActive(disableObject ? false : true);
+            Debug.Log($"{(disableObject ? "Disabled" : "Enabled")}: {targetObject.name}");
         }
         else
         {
@@ -31,7 +21,6 @@ public class ObjectDisabler : MonoBehaviour
         }
     }
     
-    // Alternative: Direct disable (no condition)
     public void DisableTarget()
     {
         if (targetObject != null)
@@ -41,7 +30,6 @@ public class ObjectDisabler : MonoBehaviour
         }
     }
     
-    // Alternative: Direct enable
     public void EnableTarget()
     {
         if (targetObject != null)
@@ -51,7 +39,6 @@ public class ObjectDisabler : MonoBehaviour
         }
     }
     
-    // Toggle between active states
     public void ToggleTarget()
     {
         if (targetObject != null)

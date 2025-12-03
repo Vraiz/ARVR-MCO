@@ -1,8 +1,7 @@
-//MaterialResizeOnClick.cs
 using UnityEngine;
 using System.Collections;
 
-public class MaterialResizeOnClick : MonoBehaviour
+public class MaterialResizeOnClick : MonoBehaviour, IDiceCheckable
 {
     [Header("Resize Settings")]
     public GameObject objectToResize;
@@ -10,23 +9,27 @@ public class MaterialResizeOnClick : MonoBehaviour
     public float collapsedYScale = 0.1f;
     public float resizeDuration = 0.5f;
     
-    [Header("Arcana Check Settings")]
+    [Header("Dice Check Settings")]
     public int difficultyClass = 12;
+    public string checkType = "Arcana Check";
     public string successMessage = "Arcana Check Passed! The water flows with magic...";
     public string failMessage = "Arcana Check Failed! The magic remains dormant.";
+    
+    public int DifficultyClass => difficultyClass;
+    public string CheckType => checkType;
+    public bool IsWaitingForRoll { get; set; } = false;
     
     private Vector3 originalScale;
     private Vector3 targetScale;
     private bool isExpanded = true;
     private bool isResizing = false;
-    public bool waitingForRoll = false; // CHANGED TO PUBLIC
     private float resizeTimer = 0f;
 
     void Start()
     {
         if (objectToResize == null)
         {
-            objectToResize = this.gameObject;
+            objectToResize = gameObject;
             Debug.LogWarning("No objectToResize assigned. Using this GameObject: " + gameObject.name);
         }
         
@@ -57,54 +60,28 @@ public class MaterialResizeOnClick : MonoBehaviour
     {
         Debug.Log("✓ CLICK DETECTED on: " + gameObject.name);
         
-        // Start arcana check process
-        StartArcanaCheck();
-    }
-
-    void StartArcanaCheck()
-    {
         if (UIManager.Instance != null)
         {
-            // Set roll type FIRST before showing UI
-            UIManager.Instance.SetRollType("Arcana Check");
-            UIManager.Instance.PositionUIInWorldSpace(this.transform);
-            UIManager.Instance.ShowInteractionUI();
-            
-            // Set up UI for dice roll
-            if (UIManager.Instance.perceptionResultText != null)
-            {
-                UIManager.Instance.perceptionResultText.text = "Tap the button to roll for Arcana Check!";
-                UIManager.Instance.perceptionResultText.color = Color.white;
-            }
-            
-            waitingForRoll = true;
-            Debug.Log("Arcana check started - waiting for dice roll");
+            UIManager.Instance.StartDiceCheck(this, "Tap for " + checkType + " (DC: " + difficultyClass + ")");
         }
         else
         {
-            Debug.LogError("UIManager.Instance is null in StartArcanaCheck!");
+            Debug.LogError("UIManager.Instance is null in HandleClick!");
         }
     }
 
-    // This method will be called by a dice roll button
-    public void ProcessArcanaCheck(int diceRoll)
+    public void ProcessDiceRoll(int diceRoll)
     {
-        if (!waitingForRoll) 
+        if (!IsWaitingForRoll) 
         {
-            Debug.Log("Arcana check not waiting for roll");
+            Debug.Log("Dice check not waiting for roll");
             return;
         }
         
-        waitingForRoll = false;
+        IsWaitingForRoll = false;
         bool success = diceRoll >= difficultyClass;
         
-        Debug.Log($"Arcana Check: Rolled {diceRoll} vs DC {difficultyClass} - {(success ? "SUCCESS" : "FAIL")}");
-        
-        // HIDE the dice roll UI but KEEP the result text visible
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.HideInteractionUI(); // This hides the roll button but keeps result text
-        }
+        Debug.Log($"{checkType}: Rolled {diceRoll} vs DC {difficultyClass} - {(success ? "SUCCESS" : "FAIL")}");
         
         string resultMessage = "";
         Color resultColor = Color.white;
@@ -112,25 +89,18 @@ public class MaterialResizeOnClick : MonoBehaviour
         if (success)
         {
             ToggleSize();
-            resultMessage = $"Roll: {diceRoll} (DC: {difficultyClass})\n\n{successMessage}";
+            resultMessage = successMessage;
             resultColor = Color.green;
         }
         else
         {
-            resultMessage = $"Roll: {diceRoll} (DC: {difficultyClass})\n\n{failMessage}";
+            resultMessage = failMessage;
             resultColor = Color.red;
         }
         
-        ShowMessage(resultMessage, resultColor);
-    }    
-
-private IEnumerator HideAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
         if (UIManager.Instance != null)
         {
-            UIManager.Instance.HideInteractionUI();
-            UIManager.Instance.ClearRollType();
+            UIManager.Instance.ShowCheckResult(checkType, diceRoll, difficultyClass, resultMessage, resultColor);
         }
     }
 
@@ -155,29 +125,20 @@ private IEnumerator HideAfterDelay(float delay)
         resizeTimer = 0f;
     }
 
-    void ShowMessage(string message, Color color)
+    // IDiceCheckable implementation
+    public Transform GetTransform()
     {
-        if (UIManager.Instance != null)
-        {
-            // Use ShowMessage which will handle the UI properly
-            // This will show the message for 3 seconds then hide everything
-            UIManager.Instance.ShowMessage(message, color, 3f);
-            Debug.Log("Arcana Check Message shown: " + message);
-        }
-        else
-        {
-            Debug.LogError("UIManager.Instance is null!");
-        }
+        return this.transform;
     }
+
     // Gaze methods
     public void OnGazeEnter()
     {
         Debug.Log("Gaze enter: " + gameObject.name);
         if (UIManager.Instance != null)
         {
-            UIManager.Instance.SetRollType("Arcana Check");
-            // Also show hint text
-            UIManager.Instance.ShowInteractionHint("Tap for Arcana Check (DC: " + difficultyClass + ")");
+            UIManager.Instance.SetRollType(checkType);
+            UIManager.Instance.ShowInteractionHint("Tap for " + checkType + " (DC: " + difficultyClass + ")");
         }
     }
 

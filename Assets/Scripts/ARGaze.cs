@@ -1,11 +1,12 @@
-//ARGAZE.cs
 using UnityEngine;
-using UnityEngine.XR.ARFoundation;
 
 public class ARGazeDetector : MonoBehaviour
 {
     private Camera arCamera;
     private GameObject currentGazedObject;
+    private ARInteractable currentInteractable;
+    private MaterialResizeOnClick currentMaterialResize;
+    private PerceptionCheck currentPerceptionCheck;
 
     void Start()
     {
@@ -16,7 +17,6 @@ public class ARGazeDetector : MonoBehaviour
     {
         DetectGazedObject();
         
-        // HANDLE CLICKS DIRECTLY HERE - SIMPLE!
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
             HandleTap(Input.GetTouch(0).position);
@@ -25,7 +25,6 @@ public class ARGazeDetector : MonoBehaviour
 
     void DetectGazedObject()
     {
-        // Your existing gaze detection code...
         Ray ray = arCamera.ScreenPointToRay(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
         RaycastHit hit;
         
@@ -33,22 +32,63 @@ public class ARGazeDetector : MonoBehaviour
         {
             if (hit.collider.gameObject != currentGazedObject)
             {
-                if (currentGazedObject != null) CallGazeExit(currentGazedObject);
+                ClearCurrentGaze();
                 currentGazedObject = hit.collider.gameObject;
-                CallGazeEnter(currentGazedObject);
+                
+                // Try ARInteractable first
+                currentInteractable = currentGazedObject.GetComponent<ARInteractable>();
+                if (currentInteractable != null)
+                {
+                    currentInteractable.OnGazeEnter();
+                    return;
+                }
+                
+                // Try MaterialResizeOnClick
+                currentMaterialResize = currentGazedObject.GetComponent<MaterialResizeOnClick>();
+                if (currentMaterialResize != null)
+                {
+                    currentMaterialResize.OnGazeEnter();
+                    return;
+                }
+                
+                // Try PerceptionCheck
+                currentPerceptionCheck = currentGazedObject.GetComponent<PerceptionCheck>();
+                if (currentPerceptionCheck != null)
+                {
+                    currentPerceptionCheck.OnGazeEnter();
+                    return;
+                }
             }
         }
         else
         {
-            if (currentGazedObject != null)
-            {
-                CallGazeExit(currentGazedObject);
-                currentGazedObject = null;
-            }
+            ClearCurrentGaze();
         }
     }
 
-    // SIMPLE TAP HANDLING
+    void ClearCurrentGaze()
+    {
+        if (currentInteractable != null)
+        {
+            currentInteractable.OnGazeExit();
+            currentInteractable = null;
+        }
+        
+        if (currentMaterialResize != null)
+        {
+            currentMaterialResize.OnGazeExit();
+            currentMaterialResize = null;
+        }
+        
+        if (currentPerceptionCheck != null)
+        {
+            currentPerceptionCheck.OnGazeExit();
+            currentPerceptionCheck = null;
+        }
+        
+        currentGazedObject = null;
+    }
+
     void HandleTap(Vector2 touchPosition)
     {
         Ray ray = arCamera.ScreenPointToRay(touchPosition);
@@ -66,58 +106,21 @@ public class ARGazeDetector : MonoBehaviour
                 return;
             }
             
-            // Try other clickable types...
-            PerceptionCheck perception = hit.collider.GetComponent<PerceptionCheck>();
-            if (perception != null)
+            // Try ARInteractable - call HandleInteraction which is now public
+            ARInteractable interactable = hit.collider.GetComponent<ARInteractable>();
+            if (interactable != null)
             {
-                // Perception check will handle its own click
+                interactable.HandleInteraction();
                 return;
             }
             
-            ClickDetector click = hit.collider.GetComponent<ClickDetector>();
-            if (click != null)
+            // Try PerceptionCheck
+            PerceptionCheck perception = hit.collider.GetComponent<PerceptionCheck>();
+            if (perception != null)
             {
-                // ClickDetector will handle its own click  
+                perception.HandleInteraction();
                 return;
             }
-        }
-    }
-
-    // In ARGaze.cs, update the CallGazeEnter and CallGazeExit methods:
-
-    void CallGazeEnter(GameObject obj)
-    {
-        MaterialResizeOnClick resize = obj.GetComponent<MaterialResizeOnClick>();
-        if (resize != null)
-        {
-            resize.OnGazeEnter();
-            return;
-        }
-        
-        // Add PerceptionCheck gaze handling
-        PerceptionCheck perception = obj.GetComponent<PerceptionCheck>();
-        if (perception != null)
-        {
-            perception.OnGazeEnter();
-            return;
-        }
-    }
-
-    void CallGazeExit(GameObject obj)
-    {
-        MaterialResizeOnClick resize = obj.GetComponent<MaterialResizeOnClick>();
-        if (resize != null)
-        {
-            resize.OnGazeExit();
-            return;
-        }
-        
-        // Add PerceptionCheck gaze handling
-        PerceptionCheck perception = obj.GetComponent<PerceptionCheck>();
-        if (perception != null)
-        {
-            perception.OnGazeExit();
-            return;
         }
     }
 }

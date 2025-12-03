@@ -1,58 +1,39 @@
-//PerceptionCheck.cs
 using UnityEngine;
 using TMPro;
 using System.Collections;
-using UnityEngine.XR.ARFoundation;
-using Unity.XR.CoreUtils;
 
-public class PerceptionCheck : MonoBehaviour
+public class PerceptionCheck : ARInteractable, IDiceCheckable
 {
-    [Header("UI References - Assign in Inspector")]
-    public TMP_Text playerText;
-    public Material onMaterial;
-    public Material offMaterial;
-    public GameObject interactionUI;
-    public TMP_Text diceText;
-    public DiceRoll diceRoll;
-    
-    [Header("Perception Check Settings")]
+    [Header("Dice Check Settings")]
     public int difficultyClass = 15;
+    public string checkType = "Perception Check";
+    
     [TextArea(2, 4)]
     public string passText = "SUCCESS! You notice the portal hums with ancient magic and reveals hidden runes.";
+    
     [TextArea(2, 4)]
     public string failText = "FAILURE! The portal remains mysterious, its secrets hidden from your sight.";
+    
     public float interactionUIDisplayTime = 1f;
     public float resultDisplayTime = 3f;
     public string[] clue = new string[5];
     
-    [Header("AR Settings")]
-    public bool useGazeDetection = true;
+    public int DifficultyClass => difficultyClass;
+    public string CheckType => checkType;
+    public bool IsWaitingForRoll { get; set; } = false;
     
-    private Renderer rend;
-    private bool isInteracting = false;
-    public bool waitingForRoll = false;
-    private Camera arCamera;
-    private bool uiElementsSet = false;
-    private XROrigin xrOrigin;
-
-    // In PerceptionCheck.cs - Add null checks
-    void Start()
+    protected override void Start()
     {
-        rend = GetComponent<Renderer>();
-        FindARComponents();
+        base.Start();
         
-        // Register with UIManager - but UIManager might not be ready yet
         if (UIManager.Instance != null)
         {
             UIManager.Instance.RegisterPerceptionCheck(this);
         }
         else
         {
-            // Retry registration if UIManager isn't ready
             StartCoroutine(RegisterWhenReady());
         }
-        
-        interactionUI?.SetActive(false);
     }
 
     IEnumerator RegisterWhenReady()
@@ -63,22 +44,11 @@ public class PerceptionCheck : MonoBehaviour
         }
         UIManager.Instance.RegisterPerceptionCheck(this);
     }
-    void FindARComponents()
-    {
-        xrOrigin = FindAnyObjectByType<XROrigin>();
-        if (xrOrigin != null)
-        {
-            arCamera = xrOrigin.Camera;
-        }
-        
-        if (arCamera == null)
-        {
-            arCamera = Camera.main;
-        }
-    }
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
+        
         // AR Touch input
         if (!isInteracting && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
@@ -95,96 +65,61 @@ public class PerceptionCheck : MonoBehaviour
         
         if (Physics.Raycast(ray, out hit))
         {
-            if (hit.collider.gameObject == this.gameObject)
+            if (hit.collider.gameObject == gameObject)
             {
                 StartInteraction();
             }
         }
     }
 
-    // AR Gaze methods
-    public void OnGazeEnter()
+    // Made public to match base class
+    public override void HandleInteraction()
     {
-        if (!isInteracting && uiElementsSet)
-        {
-            rend.material = onMaterial;
-            if (playerText != null)
-                playerText.text = "Tap for Perception Check (DC: " + difficultyClass + ")";
-        }
-    }
-
-    public void OnGazeExit()
-    {
-        if (!isInteracting && uiElementsSet)
-        {
-            rend.material = offMaterial;
-            if (playerText != null)
-                playerText.text = "";
-        }
-    }
-
-    public void SetUIReferences(TMP_Text newPlayerText, GameObject newInteractionUI, TMP_Text newResultText, DiceRoll newDiceRoll)
-    {
-        playerText = newPlayerText;
-        interactionUI = newInteractionUI;
-        diceRoll = newDiceRoll;
-        uiElementsSet = (playerText != null && interactionUI != null && diceRoll != null);
-        
-        if (uiElementsSet)
-        {
-            Debug.Log("UI references set successfully for PerceptionCheck");
-        }
-        else
-        {
-            Debug.LogWarning("Some UI references are null in PerceptionCheck");
-        }
+        StartInteraction();
     }
 
     void StartInteraction()
     {
-        if (!uiElementsSet) return;
-
+        if (isInteracting) return;
+        
         isInteracting = true;
-        waitingForRoll = true;
+        IsWaitingForRoll = true;
         
-         if (UIManager.Instance != null)
-        {
-            UIManager.Instance.SetRollType("Perception Check");
-        }
-        
-        // Position UI in AR space
         if (UIManager.Instance != null)
         {
-            UIManager.Instance.PositionUIInWorldSpace(this.transform);
+            UIManager.Instance.SetRollType(checkType);
+            UIManager.Instance.PositionUIInWorldSpace(transform);
             UIManager.Instance.ShowInteractionUI();
-        }
-        
-        // Reset result text and wait for dice roll
-        if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
-        {
-            UIManager.Instance.perceptionResultText.text = "Tap the button to roll the dice!";
-            UIManager.Instance.perceptionResultText.color = Color.white;
-        }
             
-        if (diceText != null)
-        {
-            diceText.text = "";
-        } 
+            if (UIManager.Instance.perceptionResultText != null)
+            {
+                UIManager.Instance.perceptionResultText.text = "Tap the button to roll for " + checkType + "!";
+                UIManager.Instance.perceptionResultText.color = Color.white;
+            }
+        }
     }
 
     public void ProcessDiceRoll()
     {
-        if (!waitingForRoll || !uiElementsSet) return;
+        if (!IsWaitingForRoll || !isInteracting) return;
         
         int rolledValue = GetDiceRollValue();
         StartCoroutine(DisplayResults(rolledValue));
     }
 
+    public void ProcessDiceRoll(int diceRoll)
+    {
+        if (!IsWaitingForRoll || !isInteracting) return;
+        
+        StartCoroutine(DisplayResults(diceRoll));
+    }
+
     int GetDiceRollValue()
     {
-        if (diceRoll != null && diceRoll.displayText != null)
+        if (UIManager.Instance != null && UIManager.Instance.perceptionDiceRoll != null)
         {
-            if (int.TryParse(diceRoll.displayText.text, out int result))
+            var diceRoll = UIManager.Instance.perceptionDiceRoll;
+            if (diceRoll.displayText != null && int.TryParse(diceRoll.displayText.text, out int result))
             {
                 return result;
             }
@@ -195,7 +130,8 @@ public class PerceptionCheck : MonoBehaviour
 
     IEnumerator DisplayResults(int diceRollResult)
     {
-        waitingForRoll = false;
+        IsWaitingForRoll = false;
+        isInteracting = false;
         
         string resultMessage = "";
         string clueMessage = "";
@@ -203,68 +139,37 @@ public class PerceptionCheck : MonoBehaviour
         
         if (diceRollResult == 20)
         {
-            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText + "\n\nCritical Success!";
-            clueMessage = "Password revealed: Blue -> Yellow -> Red -> Green -> White";
+            resultMessage = "Critical Success! " + passText;
+            clueMessage = "You notice every detail with perfect clarity!";
             resultColor = Color.yellow;
-            
-            // Find portal and reveal password - MORE ROBUST SEARCH
-            PortalScript portal = FindAnyObjectByType<PortalScript>();
-            if (portal != null)
-            {
-                Debug.Log("PERCEPTION: Found portal! Calling RevealPassword()");
-                portal.RevealPassword();
-            }
-            else
-            {
-                Debug.LogError("PERCEPTION: No PortalScript found in scene!");
-                // Try alternative search methods
-                GameObject portalObj = GameObject.FindGameObjectWithTag("Portal");
-                if (portalObj != null)
-                {
-                    portal = portalObj.GetComponent<PortalScript>();
-                    if (portal != null)
-                    {
-                        Debug.Log("PERCEPTION: Found portal via tag! Calling RevealPassword()");
-                        portal.RevealPassword();
-                    }
-                }
-            }
         }
         else if (diceRollResult >= difficultyClass) 
         {
             int index = Random.Range(0, clue.Length);
-            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText;
+            resultMessage = passText;
             clueMessage = "Clue: " + (index < clue.Length ? clue[index] : "No clue available");
             resultColor = Color.green;
         }
         else if(diceRollResult == 1)
         {
-            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText + "\n\nCritical Failure!";
-            clueMessage = "The trophy laughs at you";
+            resultMessage = "Critical Failure! " + failText;
+            clueMessage = "You completely miss the obvious!";
             resultColor = Color.red;
         }
         else
         {
-            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText;
+            resultMessage = failText;
             clueMessage = "No clues revealed";
-            resultColor = Color.black;
+            resultColor = Color.gray;
         }
         
-        // Display result using UIManager's result text
-        if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
+        if (UIManager.Instance != null)
         {
-            // Combine result and clue into one message
-            string fullMessage = resultMessage + "\n\n" + clueMessage;
-            UIManager.Instance.perceptionResultText.text = fullMessage;
-            UIManager.Instance.perceptionResultText.color = resultColor;
+            string fullMessage = $"{checkType}: Rolled {diceRollResult} vs DC {difficultyClass}\n\n{resultMessage}\n\n{clueMessage}";
+            UIManager.Instance.ShowMessage(fullMessage, resultColor, 4f);
         }
         
-        yield return new WaitForSeconds(interactionUIDisplayTime);
-        
-        if (interactionUI != null)
-            interactionUI.SetActive(false);
-        
-        yield return new WaitForSeconds(resultDisplayTime - interactionUIDisplayTime);
+        yield return new WaitForSeconds(resultDisplayTime);
         
         EndInteraction();
     }
@@ -272,16 +177,46 @@ public class PerceptionCheck : MonoBehaviour
     public void EndInteraction()
     {
         isInteracting = false;
-        waitingForRoll = false;
+        IsWaitingForRoll = false;
         
-        // Hide UI via UIManager
         if (UIManager.Instance != null)
+        {
             UIManager.Instance.HideInteractionUI();
+            UIManager.Instance.ClearRollType();
+        }
         
-        if (uiElementsSet)
+        if (isGazed)
+        {
+            rend.material = onMaterial;
+        }
+        else
         {
             rend.material = offMaterial;
             if (playerText != null) playerText.text = "";
         }
+    }
+
+    public override void OnGazeEnter()
+    {
+        if (!isInteracting)
+        {
+            base.OnGazeEnter();
+            if (playerText != null)
+                playerText.text = "Tap for " + checkType + " (DC: " + difficultyClass + ")";
+        }
+    }
+
+    public override void OnGazeExit()
+    {
+        if (!isInteracting)
+        {
+            base.OnGazeExit();
+        }
+    }
+
+    // IDiceCheckable implementation
+    public Transform GetTransform()
+    {
+        return this.transform;
     }
 }
