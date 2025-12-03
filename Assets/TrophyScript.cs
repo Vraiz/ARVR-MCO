@@ -25,4 +25,5 @@ public class TrophyScript : MonoBehaviour
         rend.material = offMaterial;
         playerText.text = "";
     }
+    
 }

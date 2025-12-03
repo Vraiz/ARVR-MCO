@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.73986834
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_LocalPosition.y
@@ -30,7 +30,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.297171
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 80ae4d30501fc0e459ad08b6354adcc3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -97,7 +97,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c80256b202e70469512d7f1c4a40dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AlchemyScript
-  pressedMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
+  playerText: {fileID: 0}
+  onMaterial: {fileID: 0}
+  offMaterial: {fileID: 0}
+  interactionText: 
   floatingPrefab: {fileID: 3115494097304804005, guid: 0667b6b0c562e53438bf642dec91096c, type: 3}
   spawnCount: 5
   floatSpeed: 1.5

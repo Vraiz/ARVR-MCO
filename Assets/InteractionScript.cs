@@ -27,6 +27,8 @@ public class InteractionScript : MonoBehaviour
     private int currentIndex = 0;
     private CancellationTokenSource cts;
 
+    private float Adjustment = 0.2f;
+
     public void DieClicked(int number)
     {
         if (number == correctSequence[currentIndex])
@@ -96,12 +98,12 @@ public class InteractionScript : MonoBehaviour
         if (result == 20)
         {
             Notification.text = $"({result})" + " The portal opens to a secret location!";
-            //TeleportPlayer(new Vector3(2.9f*.07f,123.46f*.07f,-1.62f*.07f));
+            TeleportPlayer(new Vector3(-2.9f,86.9f,-1.1f));
         }
         else if (result >= 12)
         {
             Notification.text = $"({result})" + " The portal opens  to another realm!";
-            //TeleportPlayer(new Vector3(-4.16f*.07f,-128.45f*.07f,-1.6f*.07f));
+            TeleportPlayer(new Vector3(-5.1f,-89.2f,-1.1f));
         }
         else if (result <= 11 && result >= 2)
         {
@@ -110,7 +112,7 @@ public class InteractionScript : MonoBehaviour
         else if (result == 1)
         {
             Notification.text = $"({result})" + " The portal opens to the Transitive Planes";
-            //TeleportPlayer(new Vector3(-16.49f*.07f,-218.30f*.07f,-1.62f*.07f));
+            TeleportPlayer(new Vector3(-2.1f,-152.4f,12.1f));
         }
     }
 
