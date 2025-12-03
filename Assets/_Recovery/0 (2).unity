@@ -343,7 +343,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrackedImageSpawner
   trackedImages: {fileID: 296877221}
   ArPrefabs:
-  - {fileID: 5526856167766543339, guid: 0d16f88bbd5787d49bf32888c1e83649, type: 3}
+  - {fileID: 782953440010246893, guid: 922221dd2c6796b4a8dcfde50e341dbc, type: 3}
   - {fileID: 2566105057842073107, guid: e95f1c5adf0f4ff4c890198b6a378429, type: 3}
 --- !u!114 &296877226
 MonoBehaviour:
@@ -803,8 +803,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
-  m_fontSizeBase: 60
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1214,8 +1214,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
-  m_fontSizeBase: 60
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

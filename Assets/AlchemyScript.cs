@@ -51,9 +51,9 @@ public class AlchemyScript : MonoBehaviour
         {
             Vector3 spawnPos = transform.position +
                 new Vector3(
-                    Random.Range(-spawnSpread*3, spawnSpread*3),
+                    Random.Range(-spawnSpread*1, spawnSpread*1),
                     0,
-                    Random.Range(-spawnSpread*3, spawnSpread*3)
+                    Random.Range(-spawnSpread*1, spawnSpread*1)
                 );
 
             GameObject obj = Instantiate(sphere, spawnPos, Quaternion.identity);
@@ -69,20 +69,21 @@ public class AlchemyScript : MonoBehaviour
         if(roll == 20)
         {
             Bubbles(floating20);
-            consoleText.text = "Critical Success you have brewed an elixir of eternal youth";
+            consoleText.text = $"({roll})" + "Critical Success you have brewed an elixir of eternal youth";
         } else if (roll >= 11)
         {
             int rollPotion = rand.Next(0, 6);
             string[] potion = { "healing", "giant strength", "invisibility", "flight", "heroism", "hair loss" };
             Bubbles(floatingPrefab);
-            consoleText.text = $"({roll})" + "Success you have brewed a potion of " + potion[rollPotion];
+            consoleText.text = $"({roll})" + " Success you have brewed a potion of " + potion[rollPotion];
         }else if (roll < 11 && roll > 1)
         {
-            consoleText.text = "The reagents failed to activate the catalyst";
+            consoleText.text = $"({roll})" + " The reagents failed to activate the catalyst";
         }else if (roll == 1)
         {
             Bubbles(floating1);
-            consoleText.text = "Critical Failure you've caused the reagents to congeal";
+            consoleText.text = $"({roll})" + "Critical Failure you've caused the reagents to congeal";
+            isBroken = true;
         }
     }
 
@@ -149,7 +150,7 @@ public class AlchemyScript : MonoBehaviour
         }
 
 
-        if (Input.GetMouseButtonDown(0) && playerText.text == interactionText)
+        if (Input.GetMouseButtonDown(0) && playerText.text == interactionText && isBroken == false)
         {
             Roll();
         }
