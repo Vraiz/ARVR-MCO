@@ -9427,6 +9427,7 @@ MonoBehaviour:
   - The fourth die you click is the green one
   - The last die you pick is the white one
   useGazeDetection: 1
+  waitingForRoll: 0
 --- !u!114 &9216394520330619184
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,146 +1,107 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
-using Unity.XR.CoreUtils;
-
+using UnityEngine.XR.ARSubsystems;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using System.Threading;
+using System.Threading.Tasks;
 public class ClickDetector : MonoBehaviour
 {
-    [Header("UI and Visual Settings")]
     public TMP_Text playerText;
     public Material onMaterial;
     public Material offMaterial;
-    public string interactionText = "Look at me!";
-    
-    [Header("Interaction Settings")]
-    public bool enableTapInteraction = true;
-    public float tapTextDisplayTime = 2f;
-    
+    public string interactionText;
     private Renderer rend;
+    public ARRaycastManager raycastManager;
+    private List<ARRaycastHit> hits = new List<ARRaycastHit>();
     private Camera arCamera;
-    private XROrigin xrOrigin;
-    private bool isGazed = false;
+    public GameObject selectionText;
+
+    
 
     void Start()
     {
+        selectionText = GameObject.Find("SelectionText");
+        if (selectionText != null)
+        {
+            playerText = selectionText.GetComponent<TextMeshProUGUI>();
+        }
+            
         rend = GetComponent<Renderer>();
-        FindARComponents();
+        arCamera = Camera.main;
+        offMaterial.DisableKeyword("_EMISSION");
+
+        StartCoroutine(AnimateEmission());
     }
 
-    void FindARComponents()
+    private IEnumerator AnimateEmission()
     {
-        xrOrigin = FindAnyObjectByType<XROrigin>();
-        if (xrOrigin != null)
+        while (true)
         {
-            arCamera = xrOrigin.Camera;
-        }
-        
-        if (arCamera == null)
-        {
-            arCamera = Camera.main;
+            offMaterial.DisableKeyword("_EMISSION");
+            yield return new WaitForSeconds(0.5f);
+            offMaterial.EnableKeyword("_EMISSION");
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
     void Update()
     {
-        // AR Touch input - works independently of gaze (like PerceptionCheck)
-        if (enableTapInteraction && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-        {
-            CheckForARTouch(Input.GetTouch(0).position);
-        }
-    }
-
-    void CheckForARTouch(Vector2 touchPosition)
-    {
-        if (arCamera == null) return;
-
-        Ray ray = arCamera.ScreenPointToRay(touchPosition);
-        RaycastHit hit;
-        
-        if (Physics.Raycast(ray, out hit))
-        {
-            if (hit.collider.gameObject == this.gameObject)
-            {
-                OnObjectTapped();
-            }
-        }
-    }
-
-    void OnObjectTapped()
-    {
-        Debug.Log("ClickDetector tapped: " + gameObject.name);
-        
-        // Toggle material on tap - original functionality
-        if (rend.material == onMaterial)
-        {
-            rend.material = offMaterial;
-        }
-        else
-        {
-            rend.material = onMaterial;
-        }
-        
-        // Show tap feedback in text - original functionality
-        if (playerText != null)
-        {
-            playerText.text = "Tapped: " + interactionText;
             
-            // Clear the text after delay if not gazed
-            if (!isGazed)
-            {
-                Invoke("ClearText", tapTextDisplayTime);
-            }
-        }
-        
-        // Also show feedback in UIManager's result text
-        if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
+        if (raycastManager == null)
         {
-            UIManager.Instance.perceptionResultText.text = "Interacted with: " + interactionText;
-            UIManager.Instance.perceptionResultText.color = Color.blue;
+            raycastManager = FindObjectOfType<ARRaycastManager>();
+        }
+
+        if (selectionText == null)
+        {
             
-            // Clear the text after delay if not gazed
-            if (!isGazed)
+            selectionText = GameObject.Find("SelectionText");
+            if (selectionText != null)
             {
-                Invoke("ClearResultText", tapTextDisplayTime);
+
+                playerText = selectionText.GetComponent<TextMeshProUGUI>();
+            }
+        }
+        if (Input.touchCount > 0) {
+            Touch touch = Input.GetTouch(0);
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                return;
+
+            // Raycast
+            Ray ray = arCamera.ScreenPointToRay(touch.position);
+
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                if (hit.collider != null && hit.collider.gameObject == this.gameObject)
+                {
+                    OnTapped();
+                }
             }
         }
     }
 
-    void ClearText()
+    void OnTapped()
     {
-        if (playerText != null && !isGazed)
-        {
-            playerText.text = "";
-        }
-    }
-    
-    void ClearResultText()
-    {
-        if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null && !isGazed)
-        {
-            UIManager.Instance.perceptionResultText.text = "";
-        }
-    }
-
-    // AR Gaze methods - original functionality
-    public void OnGazeEnter()
-    {
-        isGazed = true;
         rend.material = onMaterial;
-        if (playerText != null)
-            playerText.text = interactionText;
+        playerText.text = interactionText;
     }
 
-    public void OnGazeExit()
+
+
+
+    void OnMouseEnter()
     {
-        isGazed = false;
+        rend.material = onMaterial;
+        playerText.text = interactionText;
+    }
+
+    void OnMouseExit()
+    {
         rend.material = offMaterial;
-        if (playerText != null)
-            playerText.text = "";
-            
-        // Also clear result text when gaze exits
-        if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
-        {
-            UIManager.Instance.perceptionResultText.text = "";
-        }
+        playerText.text = "";
     }
 }

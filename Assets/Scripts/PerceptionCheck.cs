@@ -212,7 +212,7 @@ public class PerceptionCheck : MonoBehaviour
             if (portal != null)
             {
                 Debug.Log("PERCEPTION: Found portal! Calling RevealPassword()");
-                portal.RevealPassword();
+                
             }
             else
             {
@@ -225,7 +225,7 @@ public class PerceptionCheck : MonoBehaviour
                     if (portal != null)
                     {
                         Debug.Log("PERCEPTION: Found portal via tag! Calling RevealPassword()");
-                        portal.RevealPassword();
+                        ;
                     }
                 }
             }
