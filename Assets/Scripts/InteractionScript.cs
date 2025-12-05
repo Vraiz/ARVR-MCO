@@ -122,7 +122,6 @@ public class InteractionScript : MonoBehaviour
         if(PortalHome == null)
         {
             PortalHome = GameObject.Find("Doran(Clone)");
-            Debug.Log(PortalHome.name);
             if(PortalHome!= null)
             {
                 oldPosition = PortalHome.transform.position;
