@@ -292,6 +292,7 @@ PrefabInstance:
     - {fileID: 5113128919366197524, guid: 40919373d736df1469b5f99169201ca1, type: 3}
     - {fileID: 4312019316598746399, guid: 40919373d736df1469b5f99169201ca1, type: 3}
     - {fileID: 1321296894945068483, guid: 40919373d736df1469b5f99169201ca1, type: 3}
+    - {fileID: 8003030833802055248, guid: 40919373d736df1469b5f99169201ca1, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8215183880318706215, guid: 40919373d736df1469b5f99169201ca1, type: 3}
@@ -532,7 +533,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceRoll
   displayText: {fileID: 0}
   diceSides: 20
-  perceptionCheckObjectName: 11
+  perceptionCheckObjectName: FaceActive
 --- !u!1 &6781692534994053688 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8165715514753327887, guid: 40919373d736df1469b5f99169201ca1, type: 3}
