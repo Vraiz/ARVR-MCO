@@ -1912,9 +1912,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2080204977543188312}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7acf1a99d22185d47988f889054d68d0, type: 3}
+  m_Script: {fileID: 11500000, guid: a56109c0e6511a64e948c61e27c7c0e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  displayText: {fileID: 1650751025322759724}
+  diceSides: 20
+  perceptionCheckObjectName: 
 --- !u!224 &2525690864051911655
 RectTransform:
   m_ObjectHideFlags: 0
