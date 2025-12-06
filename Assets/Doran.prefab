@@ -248,6 +248,10 @@ PrefabInstance:
       propertyPath: interactionUI
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 8857569988494200062, guid: 40919373d736df1469b5f99169201ca1, type: 3}
+      propertyPath: difficultyClass
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 8898510651689239824, guid: 40919373d736df1469b5f99169201ca1, type: 3}
       propertyPath: playerText
       value: 
@@ -533,7 +537,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceRoll
   displayText: {fileID: 0}
   diceSides: 20
-  perceptionCheckObjectName: FaceActive
+  perceptionCheckObjectName: 
 --- !u!1 &6781692534994053688 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8165715514753327887, guid: 40919373d736df1469b5f99169201ca1, type: 3}
