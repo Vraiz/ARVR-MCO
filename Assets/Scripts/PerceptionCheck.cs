@@ -1,15 +1,18 @@
+//PerceptionCheck.cs
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.XR.ARFoundation;
+using Unity.XR.CoreUtils;
 
 public class PerceptionCheck : MonoBehaviour
 {
-    [Header("UI References - Will be found automatically")]
+    [Header("UI References - Assign in Inspector")]
     public TMP_Text playerText;
     public Material onMaterial;
     public Material offMaterial;
     public GameObject interactionUI;
-    public TMP_Text resultText;
+    public TMP_Text diceText;
     public DiceRoll diceRoll;
     
     [Header("Perception Check Settings")]
@@ -20,114 +23,72 @@ public class PerceptionCheck : MonoBehaviour
     public string failText = "FAILURE! The portal remains mysterious, its secrets hidden from your sight.";
     public float interactionUIDisplayTime = 1f;
     public float resultDisplayTime = 3f;
+    public string[] clue = new string[5];
     
-    // UI GameObject names to search for
-    private const string PLAYER_TEXT_NAME = "PerceptionCheck";
-    private const string INTERACTION_UI_NAME = "InteractionUI"; // Adjust if different
-    private const string RESULT_TEXT_NAME = "ResultTextTMP";
-    private const string DICE_ROLL_NAME = "DiceRoll";
+    [Header("AR Settings")]
+    public bool useGazeDetection = true;
     
     private Renderer rend;
     private bool isInteracting = false;
-    private bool waitingForRoll = false;
+    public bool waitingForRoll = false;
     private Camera arCamera;
-    private bool uiElementsFound = false;
+    private bool uiElementsSet = false;
+    private XROrigin xrOrigin;
 
+    // In PerceptionCheck.cs - Add null checks
     void Start()
     {
         rend = GetComponent<Renderer>();
-        arCamera = Camera.main;
+        FindARComponents();
         
-        // Find UI elements automatically
-        FindUIElements();
+        // Register with UIManager - but UIManager might not be ready yet
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.RegisterPerceptionCheck(this);
+        }
+        else
+        {
+            // Retry registration if UIManager isn't ready
+            StartCoroutine(RegisterWhenReady());
+        }
         
-        if (interactionUI != null)
-            interactionUI.SetActive(false);
+        interactionUI?.SetActive(false);
     }
 
-    void FindUIElements()
+    IEnumerator RegisterWhenReady()
     {
-        // Find Player Text (TMP)
-        GameObject playerTextObj = GameObject.Find(PLAYER_TEXT_NAME);
-        if (playerTextObj != null)
+        while (UIManager.Instance == null)
         {
-            playerText = playerTextObj.GetComponent<TMP_Text>();
-            if (playerText == null)
-            {
-                Debug.LogWarning("Found " + PLAYER_TEXT_NAME + " but it has no TMP_Text component");
-            }
+            yield return new WaitForSeconds(0.1f);
         }
-        else
+        UIManager.Instance.RegisterPerceptionCheck(this);
+    }
+    void FindARComponents()
+    {
+        xrOrigin = FindAnyObjectByType<XROrigin>();
+        if (xrOrigin != null)
         {
-            Debug.LogWarning("Could not find Player Text object: " + PLAYER_TEXT_NAME);
+            arCamera = xrOrigin.Camera;
         }
-
-        // Find Interaction UI
-        interactionUI = GameObject.Find(INTERACTION_UI_NAME);
-        if (interactionUI == null)
-        {
-            Debug.LogWarning("Could not find Interaction UI: " + INTERACTION_UI_NAME);
-        }
-
-        // Find Result Text (TMP)
-        GameObject resultTextObj = GameObject.Find(RESULT_TEXT_NAME);
-        if (resultTextObj != null)
-        {
-            resultText = resultTextObj.GetComponent<TMP_Text>();
-            if (resultText == null)
-            {
-                Debug.LogWarning("Found " + RESULT_TEXT_NAME + " but it has no TMP_Text component");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Could not find Result Text object: " + RESULT_TEXT_NAME);
-        }
-
-        // Find Dice Roll component
-        GameObject diceRollObj = GameObject.Find(DICE_ROLL_NAME);
-        if (diceRollObj != null)
-        {
-            diceRoll = diceRollObj.GetComponent<DiceRoll>();
-            if (diceRoll == null)
-            {
-                Debug.LogWarning("Found " + DICE_ROLL_NAME + " but it has no DiceRoll component");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Could not find Dice Roll object: " + DICE_ROLL_NAME);
-        }
-
-        // Check if all essential elements were found
-        uiElementsFound = (playerText != null && interactionUI != null && resultText != null && diceRoll != null);
         
-        if (!uiElementsFound)
+        if (arCamera == null)
         {
-            Debug.LogError("Some UI elements are missing! Perception check may not work properly.");
-        }
-        else
-        {
-            Debug.Log("All UI elements found successfully for PerceptionCheck");
+            arCamera = Camera.main;
         }
     }
 
     void Update()
     {
-        // Touch input for AR
+        // AR Touch input
         if (!isInteracting && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
-            CheckForPerceptionObjectTouch(Input.GetTouch(0).position);
+            CheckForARTouch(Input.GetTouch(0).position);
         }
     }
 
-    void CheckForPerceptionObjectTouch(Vector2 touchPosition)
+    void CheckForARTouch(Vector2 touchPosition)
     {
-        if (!uiElementsFound)
-        {
-            Debug.LogWarning("UI elements not found, cannot start interaction");
-            return;
-        }
+        if (arCamera == null) return;
 
         Ray ray = arCamera.ScreenPointToRay(touchPosition);
         RaycastHit hit;
@@ -141,47 +102,79 @@ public class PerceptionCheck : MonoBehaviour
         }
     }
 
-    // Visual feedback when object is being looked at
-    public void OnObjectGazed()
+    // AR Gaze methods
+    public void OnGazeEnter()
     {
-        if (!isInteracting && uiElementsFound)
+        if (!isInteracting && uiElementsSet)
         {
             rend.material = onMaterial;
-            playerText.text = "Tap for Perception Check (DC: " + difficultyClass + ")";
+            if (playerText != null)
+                playerText.text = "Tap for Perception Check (DC: " + difficultyClass + ")";
         }
     }
 
-    public void OnObjectUngazed()
+    public void OnGazeExit()
     {
-        if (!isInteracting && uiElementsFound)
+        if (!isInteracting && uiElementsSet)
         {
             rend.material = offMaterial;
-            playerText.text = "";
+            if (playerText != null)
+                playerText.text = "";
+        }
+    }
+
+    public void SetUIReferences(TMP_Text newPlayerText, GameObject newInteractionUI, TMP_Text newResultText, DiceRoll newDiceRoll)
+    {
+        playerText = newPlayerText;
+        interactionUI = newInteractionUI;
+        diceRoll = newDiceRoll;
+        uiElementsSet = (playerText != null && interactionUI != null && diceRoll != null);
+        
+        if (uiElementsSet)
+        {
+            Debug.Log("UI references set successfully for PerceptionCheck");
+        }
+        else
+        {
+            Debug.LogWarning("Some UI references are null in PerceptionCheck");
         }
     }
 
     void StartInteraction()
     {
-        if (!uiElementsFound) return;
+        if (!uiElementsSet) return;
 
         isInteracting = true;
         waitingForRoll = true;
         
-        // Show UI
-        if (interactionUI != null)
-            interactionUI.SetActive(true);
+         if (UIManager.Instance != null)
+        {
+            UIManager.Instance.SetRollType("Perception Check");
+        }
+        
+        // Position UI in AR space
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.PositionUIInWorldSpace(this.transform);
+            UIManager.Instance.ShowInteractionUI();
+        }
         
         // Reset result text and wait for dice roll
-        if (resultText != null)
+        if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
         {
-            resultText.text = "Tap the button to roll the dice!";
-            resultText.color = Color.white;
+            UIManager.Instance.perceptionResultText.text = "Tap the button to roll the dice!";
+            UIManager.Instance.perceptionResultText.color = Color.white;
         }
+            
+        if (diceText != null)
+        {
+            diceText.text = "";
+        } 
     }
 
     public void ProcessDiceRoll()
     {
-        if (!waitingForRoll || !uiElementsFound) return;
+        if (!waitingForRoll || !uiElementsSet) return;
         
         int rolledValue = GetDiceRollValue();
         StartCoroutine(DisplayResults(rolledValue));
@@ -204,15 +197,66 @@ public class PerceptionCheck : MonoBehaviour
     {
         waitingForRoll = false;
         
-        if (diceRollResult >= difficultyClass)
+        string resultMessage = "";
+        string clueMessage = "";
+        Color resultColor = Color.white;
+        
+        if (diceRollResult == 20)
         {
-            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText;
-            resultText.color = Color.green;
+            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText + "\n\nCritical Success!";
+            clueMessage = "Password revealed: Blue -> Yellow -> Red -> Green -> White";
+            resultColor = Color.yellow;
+            
+            // Find portal and reveal password - MORE ROBUST SEARCH
+            PortalScript portal = FindAnyObjectByType<PortalScript>();
+            if (portal != null)
+            {
+                Debug.Log("PERCEPTION: Found portal! Calling RevealPassword()");
+                
+            }
+            else
+            {
+                Debug.LogError("PERCEPTION: No PortalScript found in scene!");
+                // Try alternative search methods
+                GameObject portalObj = GameObject.FindGameObjectWithTag("Portal");
+                if (portalObj != null)
+                {
+                    portal = portalObj.GetComponent<PortalScript>();
+                    if (portal != null)
+                    {
+                        Debug.Log("PERCEPTION: Found portal via tag! Calling RevealPassword()");
+                        ;
+                    }
+                }
+            }
+        }
+        else if (diceRollResult >= difficultyClass) 
+        {
+            int index = Random.Range(0, clue.Length);
+            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + passText;
+            clueMessage = "Clue: " + (index < clue.Length ? clue[index] : "No clue available");
+            resultColor = Color.green;
+        }
+        else if(diceRollResult == 1)
+        {
+            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText + "\n\nCritical Failure!";
+            clueMessage = "The trophy laughs at you";
+            resultColor = Color.red;
         }
         else
         {
-            resultText.text = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText;
-            resultText.color = Color.red;
+            resultMessage = "Roll: " + diceRollResult + " (DC: " + difficultyClass + ")\n\n" + failText;
+            clueMessage = "No clues revealed";
+            resultColor = Color.black;
+        }
+        
+        // Display result using UIManager's result text
+        if (UIManager.Instance != null && UIManager.Instance.perceptionResultText != null)
+        {
+            // Combine result and clue into one message
+            string fullMessage = resultMessage + "\n\n" + clueMessage;
+            UIManager.Instance.perceptionResultText.text = fullMessage;
+            UIManager.Instance.perceptionResultText.color = resultColor;
         }
         
         yield return new WaitForSeconds(interactionUIDisplayTime);
@@ -230,24 +274,14 @@ public class PerceptionCheck : MonoBehaviour
         isInteracting = false;
         waitingForRoll = false;
         
-        if (interactionUI != null)
-            interactionUI.SetActive(false);
+        // Hide UI via UIManager
+        if (UIManager.Instance != null)
+            UIManager.Instance.HideInteractionUI();
         
-        if (uiElementsFound)
+        if (uiElementsSet)
         {
             rend.material = offMaterial;
-            playerText.text = "";
-            resultText.text = "";
+            if (playerText != null) playerText.text = "";
         }
-    }
-
-    // Public method to manually set UI references if needed
-    public void SetUIReferences(TMP_Text newPlayerText, GameObject newInteractionUI, TMP_Text newResultText, DiceRoll newDiceRoll)
-    {
-        playerText = newPlayerText;
-        interactionUI = newInteractionUI;
-        resultText = newResultText;
-        diceRoll = newDiceRoll;
-        uiElementsFound = (playerText != null && interactionUI != null && resultText != null && diceRoll != null);
     }
 }

@@ -1,0 +1,152 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &3966093894776918452
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.175
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.175
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.175
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4683669308469848369, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: a5dc6fb82191fd74597b68b0d74842e2, type: 2}
+    - target: {fileID: -1294892128559850198, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_Intensity
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: -1294892128559850198, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_BoundingSphereOverride.y
+      value: 6e-45
+      objectReference: {fileID: 0}
+    - target: {fileID: -206254283356321021, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_Intensity
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: -206254283356321021, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_BoundingSphereOverride.y
+      value: 7.4e-43
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_Name
+      value: Tatyova
+      objectReference: {fileID: 0}
+    - target: {fileID: 5958438921693756439, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_Intensity
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 5958438921693756439, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_BoundingSphereOverride.w
+      value: 1.1e-43
+      objectReference: {fileID: 0}
+    - target: {fileID: 5958438921693756439, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_BoundingSphereOverride.x
+      value: 4.5914e-41
+      objectReference: {fileID: 0}
+    - target: {fileID: 5958438921693756439, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_BoundingSphereOverride.y
+      value: NaN
+      objectReference: {fileID: 0}
+    - target: {fileID: 5958438921693756439, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_BoundingSphereOverride.z
+      value: 6.03e-43
+      objectReference: {fileID: 0}
+    - target: {fileID: 8912049515002365231, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_Intensity
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 8912049515002365231, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_BoundingSphereOverride.w
+      value: 1670.4844
+      objectReference: {fileID: 0}
+    - target: {fileID: 8912049515002365231, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      propertyPath: m_BoundingSphereOverride.y
+      value: -1.7064368e-26
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: 65702495048144492, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+    - {fileID: -8700617353114198275, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -8391222552659086748, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6194085670978048884}
+  m_SourcePrefab: {fileID: 100100000, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+--- !u!1 &4361180909861610448 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8391222552659086748, guid: 83f4dcdec8892bd4b8654135c9a8764e, type: 3}
+  m_PrefabInstance: {fileID: 3966093894776918452}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6194085670978048884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4361180909861610448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec695d26b9ee2c7448ceb8c81b581fa7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GapingMaw
+  playerText: {fileID: 0}
+  consoleText: {fileID: 0}
+  onMaterial: {fileID: 2100000, guid: 81f3b3f36471fb640a808c42ceaa4559, type: 2}
+  offMaterial: {fileID: 2100000, guid: a5dc6fb82191fd74597b68b0d74842e2, type: 2}
+  interactionText: Tempt fate and interact with the maw again?
+  triggerDistance: 2
+  raycastManager: {fileID: 0}

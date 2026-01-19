@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
+  m_Name: ReferenceImageLibrary
+  m_EditorClassIdentifier: Unity.XR.ARSubsystems::UnityEngine.XR.ARSubsystems.XRReferenceImageLibrary
+  m_GuidLow: 5102147087712751920
+  m_GuidHigh: 6444408472225264814
+  m_DataStore:
+    m_Storage: []
+  m_Images:
+  - m_SerializedGuid:
+      m_GuidLow: 4737341874600770570
+      m_GuidHigh: 10878102979991094966
+    m_SerializedTextureGuid:
+      m_GuidLow: 5342625828451138087
+      m_GuidHigh: 4617934219744872955
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: Animar
+    m_Texture: {fileID: 2800000, guid: 70a83a27d1e24a24fb8903bcb4321640, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5024128286952897850
+      m_GuidHigh: 11718062399613674880
+    m_SerializedTextureGuid:
+      m_GuidLow: 2266647612883774251
+      m_GuidHigh: 10295453341310422729
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: Doran
+    m_Texture: {fileID: 2800000, guid: a4ecab2bbffe1f74c98e6a2a44cce08e, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 5337780833302951669
+      m_GuidHigh: 14740894564717615003
+    m_SerializedTextureGuid:
+      m_GuidLow: 10710929440255263632
+      m_GuidHigh: 9453247884545096152
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: Tatyova
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 4671270963126217567
+      m_GuidHigh: 17561372672010572699
+    m_SerializedTextureGuid:
+      m_GuidLow: 9112124577122418389
+      m_GuidHigh: 14520579178573090281
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: Water Variant
+    m_Texture: {fileID: 0}

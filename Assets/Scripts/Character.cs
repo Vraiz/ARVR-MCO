@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System.Threading;
+using System.Threading.Tasks;
 
 [RequireComponent(typeof(CharacterController))]
 public class Character : MonoBehaviour
@@ -20,59 +22,165 @@ public class Character : MonoBehaviour
     public TMP_Text crossHairText;
     public TMP_Text Notification;
 
+    public TMP_Text resultText;
+
+    public TMP_Text UItext;
+
+    public GameObject interactionUI;
+
     private Vector3 moveDirection = Vector3.zero;
     private float rotationX = 0;
     private CharacterController characterController;
 
-    private bool canMove = true;
+    private bool CanMove = true;
 
     private System.Random rand = new System.Random();
 
+    private bool PortalActive = false;
+
+    public GameObject PortalHome;
+
+    public GameObject portalCPass;
+    public GameObject portalPass;
+    public GameObject portalCFail;
+
+    public GameObject Fireplace;
+
+    public int[] correctSequence = new int[5];
+    private int currentIndex = 0;
+    private CancellationTokenSource cts;
+
+    private bool isInteracting = false;
+
+    public void DieClicked(int number)
+    {
+        if (number == correctSequence[currentIndex])
+        {
+            currentIndex++;
+
+            if (currentIndex >= correctSequence.Length)
+            {
+                Notification.text = "Portal Activated!";
+                PortalActive = true;
+                currentIndex = 0;
+            } else
+            {
+                Notification.text = "Correct!";
+            }
+        }
+        else
+        {
+            Notification.text = "Incorrect!";
+            currentIndex = 0; 
+        }
+    }
+
+    public void TextClick()
+    {
+        if (cts != null)
+        {
+            cts.Cancel();
+            cts.Dispose();
+        }
+        cts = new CancellationTokenSource();
+        ClearText(cts.Token);
+    }
+
+    async void ClearText(CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(Mathf.RoundToInt(5000), cts.Token);
+            Notification.text = "";
+        }
+        catch (TaskCanceledException)
+        {
+            // Cancels exit
+        }
+    }
+
+    void TeleportPlayer(GameObject destination)
+    {
+        characterController.enabled = false;
+        characterController.transform.position = destination.transform.position;
+        characterController.enabled = true;
+    }
 
     int DiceRoll()
     {
-        return rand.Next(1, 20);
+        return rand.Next(1, 21);
     }
 
-    void TrophyEvent()
+    IEnumerator WaitForUIButton()
     {
-        int result = DiceRoll();
-        if (result == 20)
+        interactionUI?.SetActive(true);
+        isInteracting = true;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        resultText.text = "";
+        
+        // Disable camera movement script
+        MonoBehaviour cameraScript = playerCamera.GetComponent<MonoBehaviour>();
+        if (playerCamera != null)
+            playerCamera.enabled = false;
+        
+        // Reset result text and wait for dice roll
+        if (UItext != null)
         {
-            Notification.text = $"({result})" + " Critical Success! The trophy imparts clues and wisdom";
+            UItext.text = "Click the button to roll the dice!";
+            UItext.color = Color.white;
         }
-        else if (result >= 12)
-        {
-            Notification.text = $"({result})" + " You have successfully interacted with the trophy! It imparts wisdom upon you";
-        }
-        else if (result <= 11 && result >= 2)
-        {
-            Notification.text = $"({result})" + " Failure, nothing happens";
-        }
-        else if (result == 1)
-        {
-            Notification.text = $"({result})" + " Critical failrue the trophy laughs at you";
-        }
+
+        yield return new WaitUntil(() => resultText.text != "");
+
+        PortalEvent(int.Parse(resultText.text));
+
+        yield return new WaitForSeconds(2f);
+
+        UItext.text = "";
+        isInteracting = false;
+        interactionUI?.SetActive(false);
+        playerCamera.enabled = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = true;
+
+
+        
+
     }
 
-    void PortalEvent()
+    void PortalEvent(int result)
     {
-        int result = DiceRoll();
+
+        
         if (result == 20)
         {
             Notification.text = $"({result})" + " You are teleported to a secret location!";
+            UItext.text = "Secret location discovered!";
+            UItext.color = Color.orange;
+            TeleportPlayer(portalCPass);
         }
         else if (result >= 12)
         {
             Notification.text = $"({result})" + " You are teleported to another realm!";
+            UItext.text = "Tavern Entrance Discovered!";
+            UItext.color = Color.green;
+            TeleportPlayer(portalPass);
         }
         else if (result <= 11 && result >= 2)
         {
             Notification.text = $"({result})" + " Failure, nothing happens";
+            UItext.text = "Failure, nothing happens.";
+            UItext.color = Color.white;
         }
         else if (result == 1)
         {
             Notification.text = $"({result})" + " You are teleported to the Transitive Planes";
+            UItext.text = "You have been sent to the Transitive Planes!";
+            UItext.color = Color.red;
+            TeleportPlayer(portalCFail);
         }
     }
 
@@ -81,6 +189,7 @@ public class Character : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        interactionUI?.SetActive(false);
     }
 
     void Update()
@@ -89,12 +198,12 @@ public class Character : MonoBehaviour
         Vector3 right = transform.TransformDirection(Vector3.right);
 
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
-        float curSpeedX = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Horizontal") : 0;
+        float curSpeedX = CanMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Vertical") : 0;
+        float curSpeedY = CanMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Horizontal") : 0;
         float movementDirectionY = moveDirection.y;
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
-        if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
+        if (Input.GetButton("Jump") && CanMove && characterController.isGrounded)
         {
             moveDirection.y = jumpPower;
         }
@@ -108,7 +217,7 @@ public class Character : MonoBehaviour
             moveDirection.y -= gravity * Time.deltaTime;
         }
 
-        if (Input.GetKey(KeyCode.R) && canMove)
+        if (Input.GetKey(KeyCode.R) && CanMove)
         {
             characterController.height = crouchHeight;
             walkSpeed = crouchSpeed;
@@ -124,7 +233,7 @@ public class Character : MonoBehaviour
 
         characterController.Move(moveDirection * Time.deltaTime);
 
-        if (canMove)
+        if (CanMove)
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
@@ -133,20 +242,47 @@ public class Character : MonoBehaviour
         }
 
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && isInteracting == false)
             {
                 if(crossHairText.text == "Interact with portal?")
                 {
-                    PortalEvent();
+                    if(!PortalActive)
+                    {
+                        Notification.text = "Portal is offline.";
+                    }
+                    else{
+                        StartCoroutine(WaitForUIButton());
+                    }
+                    
                 } else if(crossHairText.text == "Interact with trophy?")
                 {
-                    TrophyEvent();
+                } else if(crossHairText.text == "Interact to return home")
+                {
+                    TeleportPlayer(PortalHome);
+                } else if(crossHairText.text == "Interact with blue die?")
+                {
+                    DieClicked(3);
+                } else if(crossHairText.text == "Interact with red die?")
+                {
+                    DieClicked(1);
+                } else if(crossHairText.text == "Interact with green die?")
+                {
+                    DieClicked(4);
+                } else if(crossHairText.text == "Interact with white die?")
+                {
+                    DieClicked(5);
+                } else if(crossHairText.text == "Interact with yellow die?")
+                {
+                    DieClicked(2);
+                }
+                
+                if(crossHairText.text != null)
+                {
+                    TextClick();
                 }
             }
-
-        if (Input.GetMouseButtonDown(1))
-            {
-                
-            }
+            
     }
+
+
 }
